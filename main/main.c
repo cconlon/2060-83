@@ -38,9 +38,7 @@ static  void  ISR_PB2(void);
 #define MY_TASK_STK_SIZE 1024
 //static  OS_STK  Task0Stk[MY_TASK_STK_SIZE];
 //static  OS_STK  Task1Stk[MY_TASK_STK_SIZE];
-//main
-
-//master
+//develop
 int  main (void)
 {
 #if (OS_TASK_NAME_EN == DEF_ENABLED)
