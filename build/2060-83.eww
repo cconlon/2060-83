@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$/2060-83.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$/../libboard_sam9xx5-ek/build/ewarm_550/libboard_sam9x35.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$/../libchip_sam9xx5/build/ewarm_550/libchip_sam9x35.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>ddram</name>
+      <member>
+        <project>libchip_sam9x35</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>libboard_sam9x35-ek</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>2060-83</project>
+        <configuration>ddram</configuration>
+      </member>
+    </batchDefinition>
+    <batchDefinition>
+      <name>sram</name>
+      <member>
+        <project>libchip_sam9x35</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>libboard_sam9x35-ek</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>2060-83</project>
+        <configuration>sram</configuration>
+      </member>
+    </batchDefinition>
+    <batchDefinition>
+      <name>all</name>
+      <member>
+        <project>libchip_sam9x35</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>libchip_sam9x35</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>libboard_sam9x35-ek</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>libboard_sam9x35-ek</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>2060-83</project>
+        <configuration>sram</configuration>
+      </member>
+      <member>
+        <project>2060-83</project>
+        <configuration>ddram</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+

@@ -1,0 +1,326 @@
+// ---------------------------------------------------------
+//   ATMEL Microcontroller Software Support  -  ROUSSET  -
+// ---------------------------------------------------------
+// The software is delivered "AS IS" without warranty or
+// condition of any  kind, either express, implied or
+// statutory. This includes without limitation any warranty
+// or condition with respect to merchantability or fitness
+// for any particular purpose, or against the infringements of
+// intellectual property rights of others.
+// ---------------------------------------------------------
+//  File: SAM7.mac
+//
+//  1.0 08/Mar/04 JPP    : Creation
+//  1.1 23/Mar/05 JPP    : Change Variable name
+//
+//  $Revision: 1.5 $
+//
+// ---------------------------------------------------------
+
+__var __mac_i;
+__var __mac_pt;
+
+/*
+********************************************************************
+*
+*       execUserPreload() : JTAG set initially to 32kHz
+********************************************************************
+*/
+
+execUserPreload()
+{
+    __message "------------------------------ execUserPreload ---------------------------------";
+     CheckRemap();                                              // Map internal RAM to 0x00
+
+                                                                // Get the Chip ID (AT91C_DBGU_C1R & AT91C_DBGU_C2R
+    __mac_i =__readMemory32(0xFFFFF240,"Memory");
+    __message " ---------------------------------------- Chip ID   0x",__mac_i:%X;
+    __mac_i =__readMemory32(0xFFFFF244,"Memory");
+    __message " ---------------------------------------- Extention 0x",__mac_i:%X;
+
+    __PllSetting96MHz();                                        // Initialize the PLL
+    __initSDRAM();                                              // Init SDRAM before load
+
+   AIC();                                                       // Init AIC
+   Watchdog();                                                  // Watchdog Disable
+}
+
+/*
+********************************************************************
+*
+*       __initSDRAM()
+* Function description
+* Set SDRAM to operate at MCK (96MHz)
+*********************************************************************
+*/
+
+__initSDRAM()
+{
+    __var i;
+
+
+    __message "------------------------------- SDRAM: Configure PIO's -------------------------------";
+                                                                // Configure PIOs
+    __writeMemory32(0xFFFF0000,0xFFFFF870,"Memory");            // AT91C_BASE_PIOC->PIO_ASR = 0xFFFF0000;                               // (PIOC) Select A Register (Pins [31:16])
+    __writeMemory32(0x00000000,0xFFFFF874,"Memory");            // AT91C_BASE_PIOC->PIO_BSR = 0x00000000;                               // (PIOC) Select B Register Pins: None
+    __writeMemory32(0xFFFF0000,0xFFFFF804,"Memory");            // AT91C_BASE_PIOC->PIO_PDR = 0xFFFF0000;                               //  Set pins [31:16] in peripheral mode
+
+    __writeMemory32(0x00000002,0xFFFFEE30,"Memory");            // AT91C_BASE_MATRIX->MATRIX_EBICSA  = (1 << 1);                        // Configure Chip Select 1 (CS1) for use with SDRAM controller
+
+    __sleep(100);                                               // Sleep for a while (only 200uS) necessary before pin toggles ok
+
+    __message "---------------------------- SDRAM: Set Control Register -------------------------------";
+
+//    __writeMemory32(0x32114159,0xFFFFEA08,"Memory");          // AT91C_BASE_SDRAMC->SDRAMC_CR =  AT91C_SDRAMC_TXSR_3  | AT91C_SDRAMC_TRAS_2 |
+                                                                //                                 AT91C_SDRAMC_TRCD_1  | AT91C_SDRAMC_TRP_1  |
+                                                                //                                 AT91C_SDRAMC_TRC_4   | AT91C_SDRAMC_TWR_1  |
+                                                                //                                 AT91C_SDRAMC_NC_9    | AT91C_SDRAMC_NR_13  |
+                                                                //                                 AT91C_SDRAMC_CAS_2   | AT91C_SDRAMC_DBW_32_BITS |
+                                                                //                                 AT91C_SDRAMC_NB_4_BANKS;
+
+    __writeMemory32(0x85227279,0xFFFFEA08,"Memory");            // AT91C_BASE_SDRAMC->SDRAMC_CR =  AT91C_SDRAMC_TXSR_8  | AT91C_SDRAMC_TRAS_5 |
+                                                                //                                 AT91C_SDRAMC_TRCD_2  | AT91C_SDRAMC_TRP_2  |
+                                                                //                                 AT91C_SDRAMC_TRC_7   | AT91C_SDRAMC_TWR_2  |
+                                                                //                                 AT91C_SDRAMC_NC_9    | AT91C_SDRAMC_NR_13  |
+                                                                //                                 AT91C_SDRAMC_CAS_3   | AT91C_SDRAMC_DBW_32_BITS |
+                                                                //                                 AT91C_SDRAMC_NB_4_BANKS;
+
+    __sleep(1000);                                              // Sleep for a while (only 200uS) necessary before pin toggles ok
+
+    __message "---------------------------------- SDRAM: Precharging ---------------------------------";
+
+    __writeMemory32(0x00000002,0xFFFFEA00,"Memory");            //	AT91C_BASE_SDRAMC->SDRAMC_MR    = 0x00000002;                       // Set PRCHG AL
+
+    __writeMemory32(0x00000000,0x20000000,"Memory");            //	*AT91C_SDRAM	    = 0x00000000;                                   // Perform PRCHG
+
+    __sleep(1000);                                              // Sleep for a while (only 200uS) necessary before pin toggles ok
+
+    __writeMemory32(0x00000004,0xFFFFEA00,"Memory");            //  AT91C_BASE_SDRAMC->SDRAMC_MR    = AT91C_SDRAMC_MODE_RFSH_CMD;       // Set  refresh command (next perform 8 writes to autorefresh)
+
+    for(i = 1; i <= 8; i++) {                                   //  8 refresh cycles
+        __writeMemory32(i,(0x20000000 + (i * 16)),"Memory");    //	*(AT91C_SDRAM + (i*16) = i;                                         // Perform PRCHG
+    }
+
+    __writeMemory32(0x00000003,0xFFFFEA00,"Memory");            //	AT91C_BASE_SDRAMC->SDRAMC_MR    = AT91C_SDRAMC_MODE_LMR_CMD;        // Set LMR mode
+    __writeMemory32(0xCAFEDEDE,0x20000090,"Memory");            //	*(AT91C_SDRAM + 0x24) = 0xCAFEDEDE;                                 // A mode register cycle is used to program the SDRAM paramaters
+
+    __writeMemory32(0x000002ED,0xFFFFEA04,"Memory");             // AT91C_BASE_SDRAMC->SDRAMC_TR = 0x000002ED;                          // Set SDRAM refresh timing period (7.81 * 96MHz)
+
+    __writeMemory32(0x00000000,0xFFFFEA00,"Memory");            //	AT91C_BASE_SDRAMC->SDRAMC_MR    = AT91C_SDRAMC_MODE_NORMAL_CMD;     // Set Normal mode
+    __writeMemory32(0x00000000,0x20000000,"Memory");            //	*AT91C_SDRAM        = 0x00000000;                                   // Perform Normal mode
+
+    __message "------------------------------- SDRAM Init Complete -----------------------------------";
+}
+
+/*
+********************************************************************
+*
+*       __PllSetting96MHz()
+* Function description
+*   Set MCK to 96 MHz, USB to 48MHz
+********************************************************************
+*/
+
+__PllSetting96MHz()
+{
+     __var reg_val;
+     
+     
+    __message "---------------------------- Setting PLLB (MCLK) Set to 96 MHz -----------------------------";
+
+    __writeMemory32(0x0000FF01,0xFFFFFC20,"Memory");            // AT91C_BASE_PMC->PMC_MOR = (AT91C_CKGR_OSCOUNT | AT91C_CKGR_MOSCEN);
+
+                                                                // Wait for the Main Oscillator to become stable
+     while(((0x1<<0) & __readMemory32(0xFFFFFC68, "Memory")) == 0);
+
+   __writeMemory32(0x20913F0E,0xFFFFFC2C,"Memory");             // Oscillator (18432000Hz) / 14 * (145 + 1); PLLB CLK 192MHz, usb div = 4, USBClk = 48MHz.
+
+                                                                // Wait for PLLB to lock
+     while(((0x1<<2) & __readMemory32(0xFFFFFC68, "Memory")) == 0);
+
+
+     reg_val  = __readMemory32(0xFFFFFC30, "Memory");           // reg_val = AT91C_BASE_PMC->PMC_MCKR; Read the current clock configuration
+     reg_val &= ~(3 << 8);                                      // clear the Master Divider bits. 
+     reg_val &= ~(7 << 2);                                      // clear the PRES field bits
+     reg_val |=  (1 << 8);                                      // set a Master Clock Divider of 2, MCK = 1/2 of PLL output.
+     reg_val |=  (0 << 2);                                      // reg_val |= 0; Configure a processor clock prescaler of 1. PCK = PLL output / 1
+
+   __writeMemory32(reg_val, 0xFFFFFC30,"Memory");               // AT91C_BASE_PMC->PMC_MCKR =  AT91C_PMC_PRES_CLK_2 | (previous CSS field). 
+                                                                // MCLK = ClockSrc / (prescaler = 2)
+
+                                                                // Wait for ((AT91C_BASE_PMC->PMC_SR & AT91C_PMC_MCKRDY) == 0)
+     while(((0x1<<3) & __readMemory32(0xFFFFFC68, "Memory")) == 0);
+
+     reg_val  &= ~(3 << 0);                                     // Clear the clock selection bits (CSS field)
+     reg_val  |=  (3 << 0);                                     // reg_val |=   AT91C_PMC_CSS_PLLB_CLK; Configure reg_val / CSS for PLLB clock
+
+   __writeMemory32(reg_val, 0xFFFFFC30,"Memory");               // Switch to PLLB, AT91C_BASE_PMC->PMC_MCKR =  (existing prescaler) | AT91C_PMC_CSS_PLLB_CLK;   
+                                                                // MCLK = PLLB / 2 = 96MHz
+
+                                                                // Wait for the Master clock to become stable
+     while(((0x1<<3) & __readMemory32(0xFFFFFC68, "Memory")) == 0);
+}
+
+/*
+********************************************************************
+*
+*       _Watchdog()
+*
+* Function description
+*   Clear Watchdog
+*********************************************************************
+*/
+
+Watchdog()
+{                                                               //* Watchdog Disable
+                                                                //  AT91C_BASE_WDTC->WDTC_WDMR= AT91C_WDTC_WDDIS;
+   __writeMemory32(0x00008000,0xFFFFFD44,"Memory");
+   __message "------------------------------- Watchdog Disable ----------------------------------------";
+}
+
+/*
+********************************************************************
+*
+*       CheckRemap()
+*
+* Function description
+*   Check the Remap.
+********************************************************************
+*/
+
+CheckRemap()
+{
+    __mac_i =__readMemory32(0x00000030,"Memory");               //* Read the value at 0x0
+    __mac_i =__mac_i+1;                                         //* Increment the value
+    __writeMemory32(__mac_i,0x30,"Memory");                     //* Attempt to write the value back to 0x30
+    __mac_pt =__readMemory32(0x00000030,"Memory");              //* Read 0x30
+
+    if (__mac_i == __mac_pt) {                                  //* Check if write was successful
+        __message "------------------------------- RAM is at 0x00  ----------------------------------------";
+    } else {
+        __message "------------------------------- ROM is at 0x00 -----------------------------------------";
+        __writeMemory32(0x00000003,0xFFFFEE00,"Memory");
+        __message "----------------------- Memory Map Toggled to RAM at 0x00 ------------------------------";
+    }
+}
+
+/*
+********************************************************************
+*
+*       CheckRemap()
+*
+* Function description
+*   Initialize CPU registers and set the PC to 0x00
+********************************************************************
+*/
+
+execUserSetup()
+{
+    ini();
+    __message "-------------------------------Set PC ----------------------------------------";
+    __writeMemory32(0x00000000,0xB4,"Register");
+}
+
+/*
+********************************************************************
+*
+*       __AIC()
+*
+* Function description
+*   Reset the Interrupt Controller.
+********************************************************************
+*/
+
+AIC()
+{
+    __message "------------------------------- AIC 2 INIT ---------------------------------------------";
+
+    __writeMemory32(0xffffffff,0xFFFFF124,"Memory");            // Mask All interrupt pAic->AIC_IDCR = 0xFFFFFFFF;
+    __writeMemory32(0xffffffff,0xFFFFF128,"Memory");
+    __writeMemory32(0xffffffff,0xFFFFFC14,"Memory");            // disable peripheral clock  Peripheral Clock Disable Register
+
+    __readMemory32(0xFFFA0020,"Memory");                        // #define AT91C_TC0_SR    ((AT91_REG *) 	0xFFFA0020) // (TC0) Status Register
+    __readMemory32(0xFFFA0060,"Memory");                        // #define AT91C_TC1_SR    ((AT91_REG *) 	0xFFFA0060) // (TC1) Status Register
+    __readMemory32(0xFFFA00A0,"Memory");                        // #define AT91C_TC2_SR    ((AT91_REG *) 	0xFFFA00A0) // (TC2) Status Register
+
+    for (__mac_i=0;__mac_i < 8; __mac_i++)
+    {
+      __mac_pt  =  __readMemory32(0xFFFFF130,"Memory");         // AT91C_BASE_AIC->AIC_EOICR
+    }
+}
+
+/*
+********************************************************************
+*
+*       ini() :
+* Function description
+* Write ARM9 core regsiter to Reset value
+*********************************************************************
+*/
+
+ini()
+{
+__writeMemory32(0x0,0x00,"Register");
+__writeMemory32(0x0,0x04,"Register");
+__writeMemory32(0x0,0x08,"Register");
+__writeMemory32(0x0,0x0C,"Register");
+__writeMemory32(0x0,0x10,"Register");
+__writeMemory32(0x0,0x14,"Register");
+__writeMemory32(0x0,0x18,"Register");
+__writeMemory32(0x0,0x1C,"Register");
+__writeMemory32(0x0,0x20,"Register");
+__writeMemory32(0x0,0x24,"Register");
+__writeMemory32(0x0,0x28,"Register");
+__writeMemory32(0x0,0x2C,"Register");
+__writeMemory32(0x0,0x30,"Register");
+__writeMemory32(0x0,0x34,"Register");
+__writeMemory32(0x0,0x38,"Register");
+
+__writeMemory32(0x0D3,0x98,"Register");                         // Set CPSR
+}
+
+RG()
+{
+
+__mac_i =__readMemory32(0x00,"Register");   __message "R00 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x04,"Register");   __message "R01 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x08,"Register");   __message "R02 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x0C,"Register");   __message "R03 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x10,"Register");   __message "R04 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x14,"Register");   __message "R05 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x18,"Register");   __message "R06 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x1C,"Register");   __message "R07 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x20,"Register");   __message "R08 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x24,"Register");   __message "R09 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x28,"Register");   __message "R10 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x2C,"Register");   __message "R11 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x30,"Register");   __message "R12 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x34,"Register");   __message "R13 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x38,"Register");   __message "R14 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x3C,"Register");   __message "R13 SVC 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x40,"Register");   __message "R14 SVC 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x44,"Register");   __message "R13 ABT 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x48,"Register");   __message "R14 ABT 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x4C,"Register");   __message "R13 UND 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x50,"Register");   __message "R14 UND 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x54,"Register");   __message "R13 IRQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x58,"Register");   __message "R14 IRQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x5C,"Register");   __message "R08 FIQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x60,"Register");   __message "R09 FIQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x64,"Register");   __message "R10 FIQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x68,"Register");   __message "R11 FIQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x6C,"Register");   __message "R12 FIQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x70,"Register");   __message "R13 FIQ 0x",__mac_i:%X;
+__mac_i =__readMemory32(0x74,"Register");   __message "R14 FIQ0x",__mac_i:%X;
+__mac_i =__readMemory32(0x98,"Register");   __message "CPSR     ",__mac_i:%X;
+__mac_i =__readMemory32(0x94,"Register");   __message "SPSR     ",__mac_i:%X;
+__mac_i =__readMemory32(0x9C,"Register");   __message "SPSR ABT ",__mac_i:%X;
+__mac_i =__readMemory32(0xA0,"Register");   __message "SPSR ABT ",__mac_i:%X;
+__mac_i =__readMemory32(0xA4,"Register");   __message "SPSR UND ",__mac_i:%X;
+__mac_i =__readMemory32(0xA8,"Register");   __message "SPSR IRQ ",__mac_i:%X;
+__mac_i =__readMemory32(0xAC,"Register");   __message "SPSR FIQ ",__mac_i:%X;
+
+__mac_i =__readMemory32(0xB4,"Register");   __message "PC 0x",__mac_i:%X;
+
+}
+
