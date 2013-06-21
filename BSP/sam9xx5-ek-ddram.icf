@@ -39,7 +39,8 @@ define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
 define block MYBLOCK2   with alignment = 8, size = 0x5000000   				{section MYSECTION1};
 define block SIMU_BLOCK with alignment = 8, size = 0x2000000  				{section TRAN_SECTION, 
 																			 section ChData2060_SECTION, 
-																			 section ChData_SECTION};
+																			 section ChData_SECTION,
+																			 section Send_Data_SECTION};
 
 //define block MYBLOCK2  with alignment = 8, size = 0x3000000   				{};
 //define block MYBLOCK3  with alignment = 8, size = 0x2000000   				{};

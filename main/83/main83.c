@@ -108,7 +108,7 @@ extern INT32U*		g_nArmTranChDataSampleStep;
 //
 
 /*所有动态内存的分配和释放都在此函数进行，避免碎块产生*/
-extern CPU_STK	TaskStk[N_TASKS][TASK_STK_SIZE];
+  CPU_STK	TaskStk[N_TASKS][TASK_STK_SIZE];
 
 static INT32S InitRunTimeFlag(void);
 static INT32S AllocMemery(INT32S nDynamiccnt,INT32S nTrancnt);
@@ -1275,12 +1275,15 @@ INT32S Uninit2060()
   UnInitNet();
   return re;
 }
+
 extern void Simu_Send_Data(void* ps);
+extern void receive_channel_data(void *arg);
+
 INT32S Start2060()
 {
   
   INT32S re = 0;
-  //RenewParam(&g_83param,&g_12Param);
+  RenewParam(&g_83param,&g_12Param);
   //OpenRealTimeValuePipe();
   //OpenStaticDataPipe();
   //OSTaskCreate(receive_channel_data, 0, &TaskStk[4][TASK_STK_SIZE-1], Task1_Prio+PICK_TASK_PRIO);
@@ -1290,7 +1293,7 @@ INT32S Start2060()
   //OSTaskCreate(real_time_show, 0, &TaskStk[8][TASK_STK_SIZE-1], Task1_Prio+REAL_TIME_SHOW_TASK_PRIO);
   //OSTaskCreate(real_time_show_pipe, 0, &TaskStk[8][TASK_STK_SIZE-1], Task1_Prio+REAL_TIME_SHOW_TASK_PRIO);
   
-  
+  OSTaskCreate(Simu_Send_Data, 0, &TaskStk[2][TASK_STK_SIZE-1], Task1_Prio+RECEIVE_12DATA_TASK_PRIO);
 //  OSTaskCreateExt(Simu_Send_Data,
 //                  (void           *) 0,
 //                  (OS_STK         *)&Simu_Send_Data_stk[TASK_STK_SIZE - 1],

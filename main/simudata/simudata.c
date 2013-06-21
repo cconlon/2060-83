@@ -9,25 +9,25 @@
 #include "ucos_ii.h"
 #include "simudata.h"
 
-//czx #define _DEFAULT_DATA_LTH 6250
 #define _DEFAULT_DATA_LTH 660
 INT32S	g_bDataValid;//是否存在有效数据
 //extern INT32S	g_nCurWriteSit;//写入位置，由数据接收任务操作
 //extern INT32S	g_nCurReadSit;//读取位置，由数据读取函数操作
-//extern INT32S  g_nGroupCnt;
-
-INT32S		g_nCaltKeySpeed[_MAX_JKEY_CHANNEL_CNT];
-struct tagChValue	g_pOutChValue[_MAX_SIGNAL_CHANNEL_CNT];
-//struct tagChData2060*		g_pOutChData;
+extern INT32S		g_nGroupCnt;
+extern struct tag12Param		g_12Param;
 struct tagChData2060       g_pOutChData[_MAX_SIGNAL_CHANNEL_CNT*(sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+_DEFAULT_DATA_LTH-1)*sizeof(INT32S))] @ "ChData2060_SECTION";
 struct tagChData2060*		g_pOutChDataArray[_MAX_SIGNAL_CHANNEL_CNT];
-void	receive_channel_data();
+INT32S		g_nCaltKeySpeed[_MAX_JKEY_CHANNEL_CNT];
+struct tagChValue	g_pOutChValue[_MAX_SIGNAL_CHANNEL_CNT];
+
+struct tagChData2060*		g_pOutChDataArray[_MAX_SIGNAL_CHANNEL_CNT];
+extern void receive_channel_data(void *arg);
 INT32S	BuildSignalGroupTable(INT32S nChannelSit[]);
 INT32S		g_SendTimeInterval=100;
 INT32S		g_nChValueFlag=3;//0,writing;1,valid;2,reading,3,over;
 INT32S		g_nChDataFlag=3;//0,writing;1,valid;2,reading,3,over;
 INT32S		g_nAllcnt=7000;
-INT32S		g_nBasicRPM=1000;
+INT32S		g_nBasicRPM=3000;
 INT32S		g_nChcnt=_MAX_SIGNAL_CHANNEL_CNT;
 INT32S		g_nDatalth=_DEFAULT_DATA_LTH;
 INT32S		g_nTrigerRPM=20;
@@ -44,8 +44,7 @@ INT32S		g_nKeycnt=4;
 INT32S		g_nAlertcnt=4;
 struct tagChValue  g_BasicValue;
 FP32		g_fNormalAlp;
-extern void receive_channel_data(void);
-
+#if 0
 static INT32S g_nAlertTable[][_MAX_SIGNAL_CHANNEL_CNT]={
   {1,1,1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,  0,0,0,0},
   {1,1,1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,  0,0,0,0},
@@ -99,8 +98,6 @@ static INT32S g_nAlertTable[][_MAX_SIGNAL_CHANNEL_CNT]={
   {0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,1,1,  0,0,0,0},
   {0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,1,1,  0,0,0,0},
 };
-#define _START_KEY_CH	48
-#define _ALERT_LAST		10
 static INT32S g_nKeySoncnt[]={10,10,10,10};
 static INT32S g_nJKeyTable[][12]={
   {48,30,00,01,02,03,04,05,06,07,8,9},
@@ -108,6 +105,11 @@ static INT32S g_nJKeyTable[][12]={
   {50,30,20,21,22,23,24,25,26,27,28,29},
   {51,30,30,31,32,33,34,35,36,37,38,39},
 };
+#endif
+
+#define _START_KEY_CH	48
+#define _ALERT_LAST		10
+
 static INT32S g_nChKeyNo[]={
   48,48,48,48,48,48,48,48,48,48,
   49,49,49,49,49,49,49,49,49,49,
@@ -115,10 +117,11 @@ static INT32S g_nChKeyNo[]={
   51,51,51,51,51,51,51,51,51,51,
   48,48,48,48,48,48,48,48
 };
-INT32S*		g_nKeySpeed[4][28000];
+
+INT32S		g_nKeySpeed[4][28000];
 
 FP32		g_fMaxRpmCof=1.2;
-INT32U		g_nSimuTranPiecelth=-1;
+//INT32U		g_nSimuTranPiecelth=-1;
 
 struct tagChData2060*		g_pSimuTranPiece=0;
 INT32S		g_nStartRpm=600;
@@ -184,11 +187,11 @@ INT32S Simu_BuildRamDisk()
     g_nLength[re]=g_nDatalth;
     g_nChNo[re]=re;
   }
-  //g_pChData=malloc(1024*1024*384);
-  Mem_Clr(g_pChData, sizeof(g_pChData));
+  memset(g_pChData, 0, sizeof(g_pChData));
+  //Mem_Clr(g_pChData, sizeof(g_pChData));
   nChDataSize=sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S);
-  Mem_Clr(g_pOutChData,sizeof(g_pOutChData));
   //g_pOutChData=malloc(_MAX_SIGNAL_CHANNEL_CNT*nChDataSize);
+  Mem_Clr(g_pOutChData,sizeof(g_pOutChData));
   g_pOutChDataArray[0]=g_pOutChData;
   
   for(re=1;re<_MAX_SIGNAL_CHANNEL_CNT;re++)
@@ -208,30 +211,26 @@ INT32S Simu_BuildChSpeed()//根据瞬态计划创建各个键项的按时间顺序的转速数组
   for(i=0;i<g_nKeycnt;i++)
   {
     INT32S nEventIndex=0;
-    /*
-    if(g_nKeySpeed[i])
-    free(g_nKeySpeed[i]);
-    g_nKeySpeed[i]=malloc(sizeof(INT32S)*g_nAllcnt);	
-    */
-    *g_nKeySpeed[nKeyChindex][0]=g_nStartRpm;
+    //if(g_nKeySpeed[i])
+    //  free(g_nKeySpeed[i]);
+    //g_nKeySpeed[i]=malloc(sizeof(INT32S)*g_nAllcnt);	
+    g_nKeySpeed[nKeyChindex][0]=g_nStartRpm;
     for(j=1;j<g_nAllcnt;j++)
     {
       if(j<g_TranNode[i].nTigerTime[nEventIndex*2])
       {
         g_nKeySpeed[nKeyChindex][j]=g_nKeySpeed[nKeyChindex][j-1];
         
-      }
-      else if(j>=g_TranNode[i].nTigerTime[nEventIndex*2]&&j<=g_TranNode[i].nTigerTime[nEventIndex*2+1])
+      }else if(j>=g_TranNode[i].nTigerTime[nEventIndex*2]&&j<=g_TranNode[i].nTigerTime[nEventIndex*2+1])
       {
-        *g_nKeySpeed[nKeyChindex][j]=*g_nKeySpeed[nKeyChindex][g_TranNode[i].nTigerTime[nEventIndex*2]-1]+\
+        g_nKeySpeed[nKeyChindex][j]=g_nKeySpeed[nKeyChindex][g_TranNode[i].nTigerTime[nEventIndex*2]-1]+\
           1.0*(j-g_TranNode[i].nTigerTime[nEventIndex*2])*\
             g_TranNode[i].fDeltaRPM[nEventIndex]/(g_TranNode[i].nTigerTime[nEventIndex*2+1]-g_TranNode[i].nTigerTime[nEventIndex*2]);
         if(j==g_TranNode[i].nTigerTime[nEventIndex*2+1])
         {
           nEventIndex++;
         }
-      }
-      else
+      }else
         g_nKeySpeed[nKeyChindex][j]=g_nKeySpeed[nKeyChindex][j-1];
     }
     nKeyChindex++;
@@ -334,22 +333,20 @@ INT32S Simu_BulidAlert()
 {
   INT32S re=0,i,j;
   INT32S ccc=0;
-  //czx void* p0;
   char p0[48*7*sizeof(struct tagChValue)];
   struct tagChValue* p;
   //_log("Start Build Alert SimuData\n");
   g_nSimuAlertMeasureCnt=g_nChcnt*g_nAlertcnt;
   
-  if(g_pSimuAlertMeasureValue)
-    free(g_pSimuAlertMeasureValue);
+  //if(g_pSimuAlertMeasureValue)
+  //  free(g_pSimuAlertMeasureValue);
   g_pSimuAlertMeasureValue=0;
-  //czx p0=malloc(g_nSimuAlertMeasureCnt*g_nChcnt*sizeof(struct tagChValue));
   g_pSimuAlertMeasureValue=(struct tagChValue*)p0;
   p=g_pSimuAlertMeasureValue;
   
   for(i=0;i<g_nAlertcnt;i++)
   {
-    INT32S ccc=0;
+    ccc=0;
     for(j=0;j<g_nChcnt;j++)
     {
       *p=g_BasicValue;
@@ -371,94 +368,71 @@ INT32S Simu_BulidAlert()
   return re;
 }
 
-INT8S Tran_buffer[(int)(1000*1.2*(sizeof(struct tagChData2060)+((_MAX_KEY_PT_CNT+_DEFAULT_DATA_LTH-1)*sizeof(INT32S))))] @ "TRAN_SECTION";
-  
+INT8S Tran_buffer[(int)(3000*1.2*(sizeof(struct tagChData2060)+((_MAX_KEY_PT_CNT+_DEFAULT_DATA_LTH-1)*sizeof(INT32S))))] @ "TRAN_SECTION";
 
 INT32S Simu_BulidTran()//为各个转速创建原始数据，原始数据长度固定  
 {
   INT32S re=0;
-  INT32S nOldrpm;
+  //INT32S nOldrpm;
   INT32S l;
   INT32S nDatalth=sizeof(struct tagChData2060)+((_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S));
   struct tagChData2060* p1;
-  INT32S len = 1000*1.2*(sizeof(struct tagChData2060)+((_MAX_KEY_PT_CNT+_DEFAULT_DATA_LTH-1)*sizeof(INT32S)));
+  INT32S len = 3000*1.2*(sizeof(struct tagChData2060)+((_MAX_KEY_PT_CNT+_DEFAULT_DATA_LTH-1)*sizeof(INT32S)));
   INT8S *p = Tran_buffer;
   INT8S* p8=NULL;
-  
-  //_log("Start Build Tran SimuData\n");
-  g_nSimuTranPiecelth=g_nBasicRPM*g_fMaxRpmCof;
-  g_nSimuTranPiecelth*=nDatalth;
-  //if(g_pSimuTranPiece)
-  //   free(g_pSimuTranPiece);
-  //g_pSimuTranPiece=0;
-  //p=malloc(g_nSimuTranPiecelth);	
-  
   Mem_Clr(p,len);
-  //Mem_Clr(p,g_nSimuTranPiecelth);
   g_pSimuTranPiece=(struct tagChData2060*)p;
   p1=(struct tagChData2060 *)(((INT8S*)g_pSimuTranPiece)+g_nStartRpm*nDatalth);
   
-  nOldrpm=g_nStartRpm;
+  //nOldrpm=g_nStartRpm;
+  
   for(l=g_nStartRpm;l<g_nBasicRPM*g_fMaxRpmCof-1;l++)
   {
     INT32S k;
     INT32S step;
     INT32S* p32s=&p1->nKeycnt+1;
-    //p1->nKeycnt=l/60.0*g_nDatalth/g_fPickFrequency;
     p1->nKeycnt=l*0.005208;
     p1->nPiecelen=g_nDatalth;
     p1->nFrequency=g_fPickFrequency;
     for(k=0;k<p1->nKeycnt;k++)
     {
-      //p32s[k]=k*g_nDatalth/p1->nKeycnt+g_nDatalth/8/p1->nKeycnt;
       p32s[k]=k*g_nDatalth/p1->nKeycnt+781.25/p1->nKeycnt;
     }
     
     p32s+=p1->nKeycnt;
     if(l>600)
       l=l;
-
     for(step=0;step<g_nDatalth;step++)
     {
-      //FP32 v=6.2832*l/60.0*step/g_fPickFrequency;//2pi*f*dt
-      FP32 v=0.000005236*l*step;//2pi*f*dt
-      //p32s[step]=(sin(v)*g_fCof1x+sin(v*2)*g_fCof2x+sin(v*0.5)*g_fCofP5x)*g_fLevel;
-      p32s[step]=v;
-      p32s[step]>>=1;
-    }
-
+      FP32 v=0.000005236*l*step;
+      p32s[step]=(sin(v)*g_fCof1x+sin(v*2)*g_fCof2x+sin(v/2)*g_fCofP5x)*g_fLevel;
+      p32s[step]>>=2; 
+    }					
     if(l==804||l==2028||l==3000)
       l=l;
     if(p1->nKeycnt>10)
       p1=p1;
     p8=(INT8S *)p1;
     p1=(struct tagChData2060 *)(p8+nDatalth);
-  }
-
+  }	
   //_log("End Build Tran SimuData\n");
   return re;
 }
-
 INT32S CheckSimuData()
 {
   INT32S re=0;
-#if 0
   INT32S l;
   INT32S nChDataSize=sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S);
   struct tagChData2060*  pchData=0;
-  INT32S k = 3600;//g_nBasicRPM*g_fMaxRpmCof;
-
-  for(l=g_nStartRpm;l<k-1;l++)
+  for(l=g_nStartRpm;l<g_nBasicRPM*g_fMaxRpmCof-1;l++)
   {
     pchData=(struct tagChData2060 *)(((INT8S*)g_pSimuTranPiece)+l*nChDataSize);
     if(pchData->nTrigerTime!=0||pchData->nChNo!=0||pchData->nPiecelen!=_DEFAULT_DATA_LTH||
        pchData->nFrequency!=_12_CHANNEL_SAMPLE_RATE||pchData->nKeycnt>_MAX_TRAN_KEY_POINT_CNT)
       pchData->nTrigerTime=pchData->nTrigerTime;
   }
-#endif
   return re;
 }
-
 INT32S Simu_Build()
 {
   Simu_BuildRamDisk();
@@ -507,7 +481,7 @@ INT32S	Simu_End_Read()
 INT32S WriteRamDisk(INT32U nOffset,INT32S pData[],INT32S nLength)
 {
   INT32S re=0;
-  Mem_Copy(g_pChData+nOffset,pData,nLength*sizeof(INT32S));
+  memcpy(g_pChData+nOffset,pData,nLength*sizeof(INT32S));
   return re;
 }
 
@@ -517,15 +491,14 @@ static INT32S  g_nKeyChannSit[]={0,10,20,30};
 INT32S  g_nDynamicResult[_DEFAULT_DATA_LTH]={0};
 INT32S  g_nTranResult[_DEFAULT_DATA_LTH]={0};
 INT32S  g_nKeyResult[_MAX_KEY_PT_CNT]={0};
-
 INT32S	Simu_Write_ChData(INT32S nLength[],INT32S nChNo[],INT32S nCnt,
                           INT32U nDynamicChDataOffset[],INT32U nDynamicKeyOffset[],INT32U nDynamicStep[],
                           INT32U nTranChDataOffset[],INT32U nTranKeyOffset[],INT32U nTranStep[])
 {
   INT32S re=0;
   INT32S i=0,j,nLth,nSit;
-  INT8S* pData=(INT8S *)g_pOutChData;
-  INT32S nChDataSize=sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S);
+  //INT8S* pData=(INT8S*)g_pOutChData;
+  //INT32S nChDataSize=sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S);
   INT32S noKey[]={0,0,0,0};
   
   
@@ -535,7 +508,7 @@ INT32S	Simu_Write_ChData(INT32S nLength[],INT32S nChNo[],INT32S nCnt,
     {	
       INT8S* p=(INT8S *)g_pOutChDataArray[i];
       INT32S* pChData=(INT32S *)(p+sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT-1)*sizeof(INT32S));
-      Mem_Clr(g_nDynamicResult, sizeof(g_nDynamicResult));
+      memset(g_nDynamicResult,0,sizeof(g_nDynamicResult));
       nLth=(g_nDynamicStart[i]+_DEFAULT_DATA_LTH)/nDynamicStep[i];
       g_nDynamicResult[0]=nLth;
       nSit=g_nDynamicStart[i];
@@ -547,7 +520,7 @@ INT32S	Simu_Write_ChData(INT32S nLength[],INT32S nChNo[],INT32S nCnt,
       WriteRamDisk(nDynamicChDataOffset[i],g_nDynamicResult,nLth+1);
       g_nDynamicStart[i]=(g_nDynamicStart[i]+_DEFAULT_DATA_LTH)%nDynamicStep[i];
       
-      Mem_Clr(g_nTranResult, sizeof(g_nTranResult));
+      memset(g_nTranResult,0,sizeof(g_nTranResult));
       nLth=(g_nTranStart[i]+_DEFAULT_DATA_LTH)/nTranStep[i];
       g_nTranResult[0]=nLth;
       nSit=g_nTranStart[i];
@@ -571,13 +544,13 @@ INT32S	Simu_Write_ChData(INT32S nLength[],INT32S nChNo[],INT32S nCnt,
       nLth=g_pOutChDataArray[g_nKeyChannSit[i]]->nKeycnt;
       g_nKeyResult[0]=nLth;
       nSit=g_nDynamicStart[i];
-      Mem_Copy(g_nKeyResult+1,g_pOutChDataArray[g_nKeyChannSit[i]]->pData,nLth*sizeof(INT32S));
+      memcpy(g_nKeyResult+1,g_pOutChDataArray[g_nKeyChannSit[i]]->pData,nLth*sizeof(INT32S));
       for(j=1;j<nLth+1;j++)
       {
         g_nKeyResult[j]/=nDynamicStep[i];
       }
       WriteRamDisk(nDynamicKeyOffset[i],g_nKeyResult,nLth+1);
-      Mem_Copy(g_nKeyResult+1,g_pOutChDataArray[g_nKeyChannSit[i]]->pData,nLth*sizeof(INT32S));
+      memcpy(g_nKeyResult+1,g_pOutChDataArray[g_nKeyChannSit[i]]->pData,nLth*sizeof(INT32S));
       for(j=1;j<nLth+1;j++)
       {
         g_nKeyResult[j]/=nTranStep[i];
@@ -624,36 +597,34 @@ INT32S	OutputChValue()
   }
   
   return re;
-};
+}
 
-void Simu_Send_Data(void* ps)
+INT8S Send_Data_buffer[sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+_DEFAULT_DATA_LTH-1)*sizeof(INT32S)] @ "Send_Data_SECTION";
+
+INT32S Simu_Send_Data(void *ps)
 {
   INT32S re=0,i,j,k,l,m,nKeyNo;
   INT32S nChDataSize=sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S);
   float fSign=0;
   char inf[256]={0};
-  float fv[50];
-  //void* p;
-  INT8S p[sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+_DEFAULT_DATA_LTH-1)*sizeof(INT32S)];
-  INT8S* pData=(INT8S *)g_pOutChData;
+  //float fv[50];
+  //INT8S* pData = (INT8S *)g_pOutChData;
   struct tagChData2060*  pchData=0;
   
   INT32S nCurSit[_MAX_JKEY_CHANNEL_CNT]={0};
   INT32S nSpeed[_MAX_JKEY_CHANNEL_CNT];
-  INT32S nLth[_MAX_JKEY_CHANNEL_CNT];
+  //INT32S nLth[_MAX_JKEY_CHANNEL_CNT];
   
   PAlertNode pAlert=g_AlertNode;
   
   struct tagChValue *pAv=g_pSimuAlertMeasureValue;	
   
-  PTranNode pTran=g_TranNode;
+  //PTranNode pTran=g_TranNode;
   struct tagChValue chValue;
   
   INT32S nRpmFlag=0;
   
-  //p=malloc(sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S));
-  Mem_Clr(p, sizeof(p));
-  pchData=(struct tagChData2060*)p;
+  pchData=(struct tagChData2060*)Send_Data_buffer;
   
   chValue.nTrigerTime=0;
   chValue.nChNo=0;
@@ -670,7 +641,7 @@ void Simu_Send_Data(void* ps)
   chValue.nRpmFlag=0;
   i=0;
   do{
-    // _log("Start Send SimuData\n");
+    //_log("Start Send SimuData\n");
     for(m=0;;m++)
     {		
       INT32S nChIndex=0;
@@ -679,11 +650,10 @@ void Simu_Send_Data(void* ps)
       if(g_nChValueFlag!=3||g_nChDataFlag!=3)
       {
         //OSTimeDly(g_SendTimeInterval/(1000/OS_TICKS_PER_SEC));
-        //OSTimeDly(1);
-        OSTimeDly(1 );
+        OSTimeDly(1);
         continue;
       }
-      OSSchedLock( );//禁止任务切换 
+      OSSchedLock();//禁止任务切换 
       g_nChValueFlag=0;
       g_nChDataFlag=0;
       if(i==50)
@@ -695,7 +665,7 @@ void Simu_Send_Data(void* ps)
         if(g_nChKeyNo[g_nSit[j]]>=_START_KEY_CH)
         {
           nKeyNo=g_nChKeyNo[g_nSit[j]]-_START_KEY_CH;
-          nSpeed[nKeyNo]=*g_nKeySpeed[nKeyNo][i];
+          nSpeed[nKeyNo]=g_nKeySpeed[nKeyNo][i];
           g_nCaltKeySpeed[nKeyNo]=nSpeed[nKeyNo];
         }
         else
@@ -720,25 +690,23 @@ void Simu_Send_Data(void* ps)
           pAv->nRpmFlag=nRpmFlag;
           //////输出报警通道测量值pAv
           //g_pOutChValue=pAv;
-          Mem_Copy(g_pOutChValue+g_nSit[j],pAv,sizeof(struct tagChValue));
+          memcpy(g_pOutChValue+g_nSit[j],pAv,sizeof(struct tagChValue));
           pAv++;
           
         }
         else//非报警通道
         {
-          
           chValue.nTrigerTime=i;
           chValue.nChNo=g_nSit[j];
           chValue.nRPM=nSpeed[nKeyNo];
           chValue.nRpmFlag=nRpmFlag;
           //g_pOutChValue=&chValue;
-          
-          Mem_Copy(g_pOutChValue+g_nSit[j],&chValue,sizeof(struct tagChValue));
+          memcpy(g_pOutChValue+g_nSit[j],&chValue,sizeof(struct tagChValue));
           g_pOutChValue[g_nSit[j]].nAllMeasureValue*=(100+fSign)/100.;
           g_pOutChValue[g_nSit[j]].n1xV*=(100+fSign)/100.;
           g_pOutChValue[g_nSit[j]].n2xV*=(100+fSign)/100.;
           g_pOutChValue[g_nSit[j]].n05xV*=(100+fSign)/100.;
-          fv[g_nSit[j]]=g_pOutChValue[g_nSit[j]].nAllMeasureValue;
+          //fv[g_nSit[j]]=g_pOutChValue[g_nSit[j]].nAllMeasureValue;
           g_nChValueFlag=1;
           
           ///////输出正常通道测量值chValue
@@ -748,9 +716,8 @@ void Simu_Send_Data(void* ps)
         if(i==680)
           i=i;
         memcpy(pchData,((INT8S*)g_pSimuTranPiece)+nSpeed[nKeyNo]*nChDataSize,nChDataSize);
-        //Mem_Copy(pchData,((INT8S*)g_pSimuTranPiece)+nSpeed[nKeyNo]*nChDataSize,nChDataSize);
         //	CheckSimuData();
-        nLth[nKeyNo]=nChDataSize-(_MAX_KEY_PT_CNT-pchData->nKeycnt)*sizeof(INT32S);
+        // nLth[nKeyNo]=nChDataSize-(_MAX_KEY_PT_CNT-pchData->nKeycnt)*sizeof(INT32S);
         pchData->nTrigerTime=i;
         pchData->nChNo=g_nSit[j];
         
@@ -761,9 +728,7 @@ void Simu_Send_Data(void* ps)
           p32s+=pchData->nKeycnt;
           for(step=0;step<g_nDatalth;step++)//修改报警通道原始数据幅值
           {
-           // p32s[step]=p32s[step]*pAlert->fCof[nChIndex]*g_12Param.SignalChannel[g_nSit[j]].fSensority;
-            //czx
-            p32s[step]=p32s[step]*pAlert->fCof[nChIndex];
+            p32s[step]=p32s[step]*pAlert->fCof[nChIndex]*g_12Param.SignalChannel[g_nSit[j]].fSensority;
           }					
           nChIndex++;
         }
@@ -779,17 +744,13 @@ void Simu_Send_Data(void* ps)
           {
             for(step=0;step<g_nDatalth;step++)//修改报警通道原始数据幅值
             {
-              //p32s[step]*=(100+fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
-              //czx
-              p32s[step]*=(100+fSign)/100.;
+              p32s[step]*=(100+fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
             }
           }else
           {
             for(step=0;step<g_nDatalth;step++)//修改报警通道原始数据幅值
             {
-              //p32s[step]*=(100-fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
-              //czx
-              p32s[step]*=(100-fSign)/100.;
+              p32s[step]*=(100-fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
             }
             
           }				
@@ -798,10 +759,10 @@ void Simu_Send_Data(void* ps)
         if(i==350)
           i=i;
         //g_pOutChData=pchData;
-        Mem_Clr(inf, 256);
+        memset(inf,0,256);
         //	sprintf(inf,"Ouput %d Sit\n",g_nCurWriteSit);
         //	_log(inf);
-        Mem_Copy(g_pOutChDataArray[g_nSit[j]],pchData,nChDataSize);
+        memcpy(g_pOutChDataArray[g_nSit[j]],pchData,nChDataSize);
         
       }
       if(i==50)
@@ -813,7 +774,7 @@ void Simu_Send_Data(void* ps)
                         g_nFpgaDynamicChDataOffset,g_nFpgaDynamicKeyDataOffset,g_nFpgaDynamicChDataSampleStep,
                         g_nFpgaTranDataOffset,g_nFpgaTranKeyDataOffset,g_nFpgaTranDataSampleStep);
       for(l=0;l<_MAX_SIGNAL_CHANNEL_CNT/_FPGA_GROUP_CHANNEL_CNT;l++)
-        receive_channel_data();
+        receive_channel_data(0);
       g_nChValueFlag=3;
       g_nChDataFlag=3;
       //OSTimeDly(g_SendTimeInterval/(1000/OS_TICKS_PER_SEC)/(_MAX_SIGNAL_CHANNEL_CNT/_FPGA_GROUP_CHANNEL_CNT));
@@ -836,11 +797,12 @@ void Simu_Send_Data(void* ps)
         //		break;
       }
       
-      OSSchedUnlock( );//允许任务切换 
+      OSSchedUnlock();//允许任务切换 
       CheckSimuData();
       sleep_ms(100);
     }
     //_log("End Send SimuData\n");
   }while(1);
   //free(p);	
+  return re;
 }

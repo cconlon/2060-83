@@ -87,7 +87,7 @@ static INT32S g_nSpeedArrayIndex[4]={0};
 static INT32U g_nStaticTickCount[4]  = {0};
 static INT32U g_nDynamicTickCount[4] = {0};
 
-void receive_channel_data(void);
+void receive_channel_data(void *arg);
 void InitInterfaceAddress(void);
 void InitInterfaceAddress()
 {	
@@ -134,7 +134,7 @@ void InitInterfaceAddress()
   re |= SetChDataSampleStep(0,_MAX_SIGNAL_CHANNEL_CNT*2,g_nArmDynamicChDataSampleStep);
 }
 
-void receive_channel_data()
+void receive_channel_data(void *arg)
 {
   INT32S tmp,tmp1,tmp2,tmp3,nIndex,nDevice,nChannel,*p32S,*p32S1;	
   Dynamic_Channel_Data_table* pDCT;

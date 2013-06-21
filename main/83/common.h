@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define  TASK_STK_SIZE      2<<20       /* Size of each task's stacks (# of WORDs)            */
+#define  TASK_STK_SIZE       1024       /* Size of each task's stacks (# of WORDs)            */
 #define  N_TASKS               10       /* Number of identical tasks                          */
 
 #define TaskStart_Prio			0

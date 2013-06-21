@@ -17,6 +17,7 @@
 *.cache
 *.ilk
 *.log
+*.tmp
 [Bb]in
 [Dd]ebug*/
 *.lib

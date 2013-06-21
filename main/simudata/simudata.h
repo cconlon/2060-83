@@ -34,7 +34,7 @@ typedef struct tagTranNode
 INT32S	Simu_Read_ChValue(void* pp[],int cnt[]);
 INT32S	Simu_Read_ChData(void* pp[],int cnt[]);
 
-void  Simu_Send_Data(void* ps);
+INT32S Simu_Send_Data(void* ps);
 INT32S Simu_BuildRamDisk(void);
 INT32S Simu_BuildChSpeed(void);
 INT32S Simu_Build_AlertPlan(void);
