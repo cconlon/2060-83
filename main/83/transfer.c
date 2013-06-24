@@ -53,17 +53,17 @@ void static_transfer(void * pParam)
   int32_t rArray;
   int32_t channel = 0;
   uint32_t sBuffer = 0;
-#if 0
+
   Tst_Head_DCM_SigModuSampData_SYS* pSigModuSampData;
   ProtocolHead *pProtocolHead;
   Channel_Static_Value *pValueHead;
-  _log("static_transfer\n");
+
   while(1)
   {
     WAIT_TRIGGER(jkey, rArray, g_StaticTrigerEventArray, 10)
       ;
     
-    OSSchedLock(&err);
+    OSSchedLock();
     sBuffer = sizeof(ProtocolHead) + (g_83param.Device[jkey].nSignChannelNum*sizeof(Channel_Static_Value));
     StaticBuffer[0] = sBuffer + 8;
     StaticBuffer[1] = sBuffer + 4;
@@ -101,14 +101,13 @@ void static_transfer(void * pParam)
     if(_MAX_STATIC_ARRAY_LTH == ++rArray)
       rArray = 0;
     g_StaticTrigerEventArray[jkey].ulnTrigerRead = rArray;
-    OSSchedUnlock(&err);
+    OSSchedUnlock();
     
-    OSSchedLock(&err);
-    send_data(_STATIC_CHNO, (int8_t *)StaticBuffer, sBuffer);
-    OSSchedUnlock(&err);
+    OSSchedLock();
+    //send_data(_STATIC_CHNO, (int8_t *)StaticBuffer, sBuffer);
+    OSSchedUnlock();
     sleep_ms(20);
   }
-#endif
 }
 
 void dynamic_transfer(void * pParam)

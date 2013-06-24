@@ -9,11 +9,18 @@
 //#include <netservices.h>
 #include <./simudata/simudata.h>
 #include <./83/main83.h>
+#include <netservices.h>
+
+
+// EMAC packet processing offset
+#define EMAC_RCV_OFFSET     0
+
+// Delay before a link check
+#define EMAC_LINK_CHECK_DELAY       1000000
+#define MY_TASK_STK_SIZE 1024
 
 static  OS_STK  App_TaskStartStk[APP_CFG_TASK_START_STK_SIZE];
-
-//const Pin pinPB1 = PIN_PUSHBUTTON_1;
-//const Pin pinPB2 = PIN_PUSHBUTTON_2;
+static  OS_STK  Task0Stk[MY_TASK_STK_SIZE];
 
 #define DEBOUNCE_TIME       50
 volatile unsigned int timestamp = 0;
@@ -26,19 +33,9 @@ volatile unsigned int timestamp = 0;
 static  void  App_TaskStart    (void *p_arg);
 static  void  App_ObjCreate    (void);
 static  void  App_TaskCreate   (void);
+static  void  Task0 (void *p_arg);
 
-static  void  ISR_PB1(void);
-static  void  ISR_PB2(void);
 
-/// EMAC packet processing offset
-#define EMAC_RCV_OFFSET     0
-
-/// Delay before a link check
-#define EMAC_LINK_CHECK_DELAY       1000000
-#define MY_TASK_STK_SIZE 1024
-//static  OS_STK  Task0Stk[MY_TASK_STK_SIZE];
-//static  OS_STK  Task1Stk[MY_TASK_STK_SIZE];
-//develop
 int  main (void)
 {
 #if (OS_TASK_NAME_EN == DEF_ENABLED)
@@ -49,14 +46,14 @@ int  main (void)
 #endif
   
 #if (CPU_CFG_NAME_EN == DEF_ENABLED)
-    CPU_NameSet((CPU_CHAR *)"AT91SAM9G20 CU-ES2",
-                (CPU_ERR  *)&cpu_err);
+  CPU_NameSet((CPU_CHAR *)"AT91SAM9G20 CU-ES2",
+              (CPU_ERR  *)&cpu_err);
 #endif    
   WDT_Disable(WDT);
-
+  
   BSP_PreInit();                                              /* System pre-initialization.                               */
   BSP_PostInit();
-
+  
   CPU_Init();
   Mem_Init();
   
@@ -65,10 +62,10 @@ int  main (void)
   printf("ÄãºÃ");
   LED_Toggle(0);
   LED_Toggle(1);
-
+  
   OS_CSP_TickInit();
   OSInit();                                                   /* Initialize "uC/OS-II, The Real-Time Kernel"              */
-
+  
   OSTaskCreateExt((void (*)(void *)) App_TaskStart,           /* Create the start task                                    */
                   (void           *) 0,
                   (OS_STK         *)&App_TaskStartStk[APP_CFG_TASK_START_STK_SIZE - 1],
@@ -84,25 +81,12 @@ int  main (void)
                 (INT8U *)"Start Task",
                 (INT8U *)&os_err);
 #endif
-  Simu_Build();
-  Init2060();
-  Start2060();
+  //Simu_Build();
+  //Init2060();
+  //Start2060();
   OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)       */
 }
 
-
-static  void  Task0 (void *p_arg)
-{
-#if 0
-  OSTimeDlyHMSM(0, 0, 1, 0);
-  //Test_Tcp(NULL);
-  while (DEF_TRUE) {                                  /* Task body, always written as an infinite loop.  */
-    LED_Toggle(0);
-    
-    OSTimeDlyHMSM(0, 0, 30, 0);
-  }
-#endif
-}
 
 /*
 *********************************************************************************************************
@@ -123,7 +107,7 @@ static  void  Task0 (void *p_arg)
 static  void  App_TaskStart (void *p_arg)
 {
   (void)p_arg;
-
+  
   BSP_PostInit();
 #if OS_TASK_STAT_EN > 0u
   OSStatInit();                                               /* Determine CPU capacity                                   */
@@ -137,7 +121,7 @@ static  void  App_TaskStart (void *p_arg)
   
   LED_Clear(0);
   LED_Clear(1);
-  
+  AppInit_TCPIP();
   while (DEF_TRUE) {                                          /* Task body, always written as an infinite loop.           */
     LED_Toggle(0);
     LED_Toggle(1);
@@ -191,10 +175,21 @@ static  void  App_TaskCreate (void)
   //Simu_Build();
   //Init2060();
   //Start2060();
-  //  OSTaskCreate(Task0,
-  //               NULL,
-  //               (OS_STK *)&Task0Stk[MY_TASK_STK_SIZE - 1],
-  //               APP_CFG_TASK_START_PRIO+4);
+  OSTaskCreate(Task0,
+               NULL,
+               (OS_STK *)&Task0Stk[MY_TASK_STK_SIZE - 1],
+               APP_CFG_TASK_START_PRIO+4);
   
 }
 
+static  void  Task0 (void *p_arg)
+{
+  p_arg = p_arg;
+  OSTimeDlyHMSM(0, 0, 1, 0);
+  Test_Tcp(NULL);
+  while (DEF_TRUE) {                                  /* Task body, always written as an infinite loop.  */
+    LED_Toggle(0);
+    
+    OSTimeDlyHMSM(0, 0, 30, 0);
+  }
+}
