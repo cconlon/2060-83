@@ -8,7 +8,7 @@
 NET_SOCK_ADDR_IP  TestRemoteSockAddr;
 NET_SOCK_ID       TestClientSockID;
 
-#if uC_TCPIP_MODULE > 0
+#if uC_TCPIP_MODULE == DEF_ENABLED
 NET_IP_ADDR   ip;
 NET_IP_ADDR   msk;
 NET_IP_ADDR   gateway;
@@ -18,12 +18,12 @@ NET_ERR       err;
 /** Error bits for TX */
 #define EMAC_TX_ERR_BITS  \
 (EMAC_TXD_bmERROR | EMAC_TXD_bmUNDERRUN | EMAC_TXD_bmEXHAUSTED)
-
+#if 0
 #define  REMOTE_HOST_ADDR                 (((NET_IP_ADDR)10u << (3u * DEF_OCTET_NBR_BITS)) | \
 ((NET_IP_ADDR)217u << (2u * DEF_OCTET_NBR_BITS)) | \
   ((NET_IP_ADDR)  3u << (1u * DEF_OCTET_NBR_BITS)) | \
     ((NET_IP_ADDR)200u << (0u * DEF_OCTET_NBR_BITS)))
-
+#endif
 extern sEmacd gEmacd;
 void  Test_Tcp (void  *p_arg)
 {
@@ -34,8 +34,8 @@ void  Test_Tcp (void  *p_arg)
   Mem_Set(&TestRemoteSockAddr, (CPU_CHAR)0, NET_SOCK_ADDR_IP_SIZE);
   TestRemoteSockAddr.AddrFamily = NET_SOCK_ADDR_FAMILY_IP_V4;
   TestRemoteSockAddr.Port = NET_UTIL_HOST_TO_NET_16(50001);
-  //NetASCII_Str_to_IP("192.168.1.200", &err);//
-  TestRemoteSockAddr.Addr = NET_UTIL_HOST_TO_NET_32(REMOTE_HOST_ADDR);
+  //TestRemoteSockAddr.Addr = NET_UTIL_HOST_TO_NET_32(REMOTE_HOST_ADDR); 
+  TestRemoteSockAddr.Addr = htonl(NetASCII_Str_to_IP("10.217.3.200", &err));
   EMAC_EnableIt(gEmacd.pHw, EMAC_IER_RCOMP | EMAC_IER_ROVR | EMAC_IER_TCOMP);
   TestClientSockID = socket(AF_INET, SOCK_STREAM, NET_SOCK_PROTOCOL_TCP);  //NET_SOCK_ADDR_FAMILY_IP_V4
   connect(TestClientSockID, (struct sockaddr*)&TestRemoteSockAddr, sizeof(struct  sockaddr));
@@ -55,7 +55,7 @@ void  Test_Tcp (void  *p_arg)
   close(TestClientSockID);
 }
 
-#if uC_TCPIP_MODULE > 0
+#if uC_TCPIP_MODULE == DEF_ENABLED
 void AppInit_TCPIP (void)
 {
   

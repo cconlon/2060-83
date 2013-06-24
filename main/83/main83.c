@@ -1294,16 +1294,7 @@ INT32S Start2060()
   //OSTaskCreate(real_time_show_pipe, 0, &TaskStk[8][TASK_STK_SIZE-1], Task1_Prio+REAL_TIME_SHOW_TASK_PRIO);
   
   OSTaskCreate(Simu_Send_Data, 0, &TaskStk[2][TASK_STK_SIZE-1], Task1_Prio+RECEIVE_12DATA_TASK_PRIO);
-//  OSTaskCreateExt(Simu_Send_Data,
-//                  (void           *) 0,
-//                  (OS_STK         *)&Simu_Send_Data_stk[TASK_STK_SIZE - 1],
-//                  (INT8U           ) Task1_Prio+RECEIVE_12DATA_TASK_PRIO,
-//                  (INT16U          ) Task1_Prio+RECEIVE_12DATA_TASK_PRIO,
-//                  (OS_STK         *)&Simu_Send_Data_stk[0],
-//                  (INT32U          ) TASK_STK_SIZE,
-//                  (void           *) 0,
-//                  (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-  
+  OSTaskCreate(static_transfer, 0, &TaskStk[5][TASK_STK_SIZE-1], Task1_Prio+STATIC_TRANSFER_TASK_PRIO);
   
   //  OSTaskCreate(&Simu_Send_Data_tcb,
   //               (CPU_CHAR*)"Simu_Send_Data",
