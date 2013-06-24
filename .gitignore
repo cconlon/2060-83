@@ -18,6 +18,10 @@
 *.ilk
 *.log
 *.tmp
+*.dbgdt
+*.dni
+*.dep
+*.sfr
 [Bb]in
 [Dd]ebug*/
 *.lib

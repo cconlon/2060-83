@@ -163,15 +163,8 @@ static  void  App_ObjCreate (void)
 * Note(s)     : None.
 *********************************************************************************************************
 */
-//extern INT32S Init2060();
-//extern INT32S Start2060();
-
 static  void  App_TaskCreate (void)
 {
-  //AppInit_TCPIP();
-  //Simu_Build();
-  //Init2060();
-  //Start2060();
   OSTaskCreate(Task0,
                NULL,
                (OS_STK *)&Task0Stk[MY_TASK_STK_SIZE - 1],

@@ -1,29 +1,3 @@
-[JLinkDriver]
-WatchCond=_ 0
-Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
-Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
-CStepIntDis=_ 0
-[DebugChecksum]
-Checksum=1361824571
-[DisAssemblyWindow]
-NumStates=_ 1
-State 1=_ 1
-[InstructionProfiling]
-Enabled=_ 0
-[CodeCoverage]
-Enabled=_ 0
-[Profiling]
-Enabled=0
-[StackPlugin]
-Enabled=1
-OverflowWarningsEnabled=1
-WarningThreshold=90
-SpWarningsEnabled=1
-WarnHow=0
-UseTrigger=1
-TriggerName=main
-LimitSize=0
-ByteLimit=50
 [Stack]
 FillEnabled=0
 OverflowWarningsEnabled=1
@@ -34,6 +8,13 @@ UseTrigger=1
 TriggerName=main
 LimitSize=0
 ByteLimit=50
+[JLinkDriver]
+WatchCond=_ 0
+Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
+Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
+CStepIntDis=_ 0
+[DebugChecksum]
+Checksum=-1265144216
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -41,49 +22,19 @@ StopOnThrow=_ 0
 ShowArgs=0
 [Disassembly]
 MixedMode=1
-[Breakpoints]
-Bp0=_ "STD_CODE" "{$PROJ_DIR$\..\libboard_sam9xx5-ek\source\board_memories.c}.241.5@1" 0 0 0 0 "" 0 ""
-Bp1=_ "STD_CODE" "{$PROJ_DIR$\..\libboard_sam9xx5-ek\source\board_memories.c}.267.5@1" 0 0 0 0 "" 0 ""
-Bp2=_ "STD_CODE" "{$PROJ_DIR$\..\libboard_sam9xx5-ek\source\board_memories.c}.340.5@1" 0 0 0 0 "" 0 ""
-Bp3=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_sock.c}.9118.5@1" 0 0 0 0 "" 0 ""
-Bp4=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.13266.5@1" 0 0 0 0 "" 0 ""
-Bp5=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\OS\uCOS-II\net_os.c}.4175.5@1" 0 0 0 0 "" 0 ""
-Bp6=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_sock.c}.1921.5@1" 0 0 0 0 "" 0 ""
-Bp7=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\NIC\ETHER\DM9000EP\net_nic.c}.290.3@1" 0 0 0 0 "" 0 ""
-Bp8=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\OS\uCOS-II\net_os.c}.1581.5@1" 0 0 0 0 "" 0 ""
-Bp9=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\OS\uCOS-II\net_os.c}.1724.5@1" 0 0 0 0 "" 0 ""
-Bp10=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\OS\uCOS-II\net_os.c}.2027.5@1" 0 0 0 0 "" 0 ""
-Bp11=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\OS\uCOS-II\net_os.c}.2167.5@1" 0 0 0 0 "" 0 ""
-Bp12=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\OS\uCOS-II\net_os.c}.2222.5@1" 0 0 0 0 "" 0 ""
-Bp13=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.6417.5@1" 0 0 0 0 "" 0 ""
-Bp14=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.6107.14@1" 0 0 0 0 "" 0 ""
-Bp15=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.6536.5@1" 0 0 0 0 "" 0 ""
-Bp16=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.13108.4@1" 0 0 0 0 "" 0 ""
-Bp17=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.1028.5@1" 0 0 0 0 "" 0 ""
-Bp18=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_ip.c}.1174.5@1" 0 0 0 0 "" 0 ""
-Bp19=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\IF\net_if_pkt.c}.280.13@1" 0 0 0 0 "" 0 ""
-Bp20=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\NIC\ETHER\DM9000EP\net_nic.c}.179.3@1" 0 0 0 0 "" 0 ""
-Bp21=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\NIC\ETHER\DM9000EP\net_nic.c}.219.3@1" 0 0 0 0 "" 0 ""
-Bp22=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_sock.c}.9118.5@1" 0 0 0 0 "" 0 ""
-Bp23=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_sock.c}.1653.5@1" 0 0 0 0 "" 0 ""
-Bp24=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\NIC\ETHER\DM9000EP\net_nic.c}.481.3@1" 0 0 0 0 "" 0 ""
-Bp25=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\OS\uCOS-II\net_os.c}.411.5@1" 0 0 0 0 "" 0 ""
-Bp26=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\IF\Ether\net_if.c}.824.5@1" 0 0 0 0 "" 0 ""
-Bp27=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\IF\net_if_pkt.c}.807.5@1" 0 0 0 0 "" 0 ""
-Bp28=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.16719.5@1" 0 0 0 0 "" 0 ""
-Bp29=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.18941.13@1" 0 0 0 0 "" 0 ""
-Bp30=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.20634.23@1" 0 0 0 0 "" 0 ""
-Bp31=_ "STD_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net_tcp.c}.15256.18@1" 0 0 0 0 "" 0 ""
-Bp32=_ "STD_CODE" "{$PROJ_DIR$\..\net_bsp.c}.401.3@1" 0 0 0 0 "" 0 ""
-Bp33=_ "STD_CODE" "{$PROJ_DIR$\..\netservices.c}.46.5@1" 0 0 0 0 "" 0 ""
-Bp34=_ "STD_CODE" "{$PROJ_DIR$\..\netservices.c}.41.3@1" 0 0 0 0 "" 0 ""
-Bp35=_ "STD_CODE" "{$PROJ_DIR$\..\main.c}.58.5@1" 1 0 0 0 "" 0 ""
-Bp36=_ "STD_CODE" "{$PROJ_DIR$\..\main.c}.56.5@1" 1 0 0 0 "" 0 ""
-Bp37=_ "STD_CODE" "{$PROJ_DIR$\..\main.c}.92.3@1" 1 0 0 0 "" 0 ""
-Bp38=_ "STD_CODE" "{$PROJ_DIR$\..\BSP\cstartup.s}.95.1@1" 1 0 0 0 "" 0 ""
-Bp39=_ "STD_CODE" "{$PROJ_DIR$\..\BSP\bsp_os.c}.617.5@1" 1 0 0 0 "" 0 ""
-Bp40=_ "STD_CODE" "{$PROJ_DIR$\..\main.c}.101.3@1" 1 0 0 0 "" 0 ""
-Count=41
+[InterruptLog]
+LogEnabled=0
+SumEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+ShowTimeSum=1
+SumSortOrder=0
+[DataLog]
+LogEnabled=0
+SumEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+ShowTimeSum=1
 [Interrupts]
 Enabled=1
 [MemoryMap]
@@ -93,56 +44,15 @@ UseAuto=0
 TypeViolation=1
 UnspecRange=1
 ActionState=1
-[PowerLog]
-LogEnabled=0
-GraphEnabled=0
-ShowTimeLog=1
-Stripe=1 0 1000 2 1 0
-[InterruptLog]
-LogEnabled=0
-SumEnabled=0
-GraphEnabled=0
-ShowTimeLog=1
-ShowTimeSum=1
-SumSortOrder=0
-[TraceHelper]
+[Trace1]
 Enabled=0
 ShowSource=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main.c}.246.1" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main.c}.246.1" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\uC-TCPIP\Source\net.c}.195.5" 0 0 1 "" 0 "" 0
-Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\uC-TCPIP\NIC\ETHER\PHY\net_nic.c}.35.3" 0 0 1 "" 0 "" 0
-Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\net_bsp.c}.353.3" 0 0 1 "" 0 "" 0
-Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$}.370.9" 0 0 1 "" 0 "" 0
-Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$}.176.5" 0 0 1 "" 0 "" 0
-Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$}.163.13" 0 0 1 "" 0 "" 0
-Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\net_bsp.c}.341.3" 0 0 1 "" 0 "" 0
-Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\net_bsp.c}.357.5" 0 0 1 "" 0 "" 0
-Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\libboard_sam9xx5-ek\source\macb.c}.89.9" 0 0 1 "" 0 "" 0
-Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\uCOS-II\Source\os_time.c}.70.9" 0 0 1 "" 0 "" 0
-Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\uCOS-II\Source\os_mutex.c}.189.1" 0 0 1 "" 0 "" 0
-Bp13=_ 0 "EMUL_CODE" "0x20002988" 0 0 1 "" 0 "" 0
-Bp14=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\interface.c}.753.1" 0 0 1 "" 0 "" 0
-Bp15=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\interface.c}.753.1" 0 0 1 "" 0 "" 0
-Bp16=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\interface.c}.753.1" 0 0 1 "" 0 "" 0
-Bp17=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\interface.c}.753.3" 0 0 1 "" 0 "" 0
-Bp18=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\interface.c}.987.3" 0 0 1 "" 0 "" 0
-Bp19=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\interface.c}.872.7" 0 0 1 "" 0 "" 0
-Bp20=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\interface.c}.865.3" 0 0 1 "" 0 "" 0
-Bp21=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\simudata\simudata.c}.809.1" 0 0 1 "" 0 "" 0
-Bp22=_ 0 "EMUL_CODE" "0x20005388" 0 0 1 "" 0 "" 0
-Bp23=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\libboard_sam9xx5-ek\source\clock.c}.111.1" 0 0 1 "" 0 "" 0
-Bp24=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\libboard_sam9xx5-ek\source\clock.c}.91.5" 0 0 1 "" 0 "" 0
-Bp25=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\simudata\simudata.c}.809.1" 0 0 1 "" 0 "" 0
-Bp26=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\simudata\simudata.c}.804.9" 0 0 1 "" 0 "" 0
-Bp27=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\transfer.c}.67.5" 0 0 1 "" 0 "" 0
-Bp28=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\transfer.c}.103.5" 0 0 1 "" 0 "" 0
-Bp29=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main\netservices.c}.41.3" 0 0 1 "" 0 "" 0
-Bp30=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main\main.c}.175.3" 0 0 1 "" 0 "" 0
-Count=31
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main\main.c}.179.3" 0 0 1 "" 0 "" 0
+Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main\netservices.c}.50.7" 0 0 1 "" 0 "" 0
+Count=2
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -151,10 +61,7 @@ Category=_ 0
 LoggingEnabled=_ 0
 LogFile=_ ""
 [Aliases]
-A0=_ "D:\work\baobei\2060-83\libboard_sam9xx5-ek\source\led.c" ""
-A1=_ "D:\work\baobei\2060-83\libchip_sam9xx5\source\wdt.c" ""
-A2=_ "G:\2060-83\BSP\cstartup.s" ""
-Count=3
+Count=0
 SuppressDialog=0
 [CallStackLog]
 Enabled=0
