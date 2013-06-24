@@ -1,10 +1,10 @@
 [JLinkDriver]
 WatchCond=_ 0
-Watch0=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
-Watch1=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
+Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
+Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=-1370065790
+Checksum=1361824571
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 1
@@ -108,21 +108,6 @@ SumSortOrder=0
 [TraceHelper]
 Enabled=0
 ShowSource=1
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
-[CallStackLog]
-Enabled=0
-[DriverProfiling]
-Enabled=0
-Mode=0
-Graph=0
-Symbiont=0
-Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -156,10 +141,26 @@ Bp26=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\simudata\simudata.c}.804.9" 0 0 1 "" 0
 Bp27=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\transfer.c}.67.5" 0 0 1 "" 0 "" 0
 Bp28=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\main\83\transfer.c}.103.5" 0 0 1 "" 0 "" 0
 Bp29=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main\netservices.c}.41.3" 0 0 1 "" 0 "" 0
-Count=30
+Bp30=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main\main.c}.175.3" 0 0 1 "" 0 "" 0
+Count=31
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
 [Aliases]
 A0=_ "D:\work\baobei\2060-83\libboard_sam9xx5-ek\source\led.c" ""
 A1=_ "D:\work\baobei\2060-83\libchip_sam9xx5\source\wdt.c" ""
 A2=_ "G:\2060-83\BSP\cstartup.s" ""
 Count=3
 SuppressDialog=0
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=0
+Graph=0
+Symbiont=0
+Exclusions=

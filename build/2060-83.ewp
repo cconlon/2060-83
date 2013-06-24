@@ -2118,9 +2118,6 @@
           <file>
             <name>$PROJ_DIR$\..\uC-TCPIP\NIC\ETHER\PHY\net_nic.h</name>
           </file>
-          <file>
-            <name>$PROJ_DIR$\..\uC-TCPIP\NIC\ETHER\PHY\net_nic_def.h</name>
-          </file>
         </group>
       </group>
     </group>
