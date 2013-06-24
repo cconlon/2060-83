@@ -153,10 +153,4 @@ void  App_SerPrintf (CPU_CHAR  *p_fmt, ...);
 */
 #define  uC_TCPIP_MODULE                 DEF_ENABLED
 
-                                                                /* AT91RM9200 EMAC MAC address source :                 */
-                                                                /* AT91RM9200_EMAC_MAC_ADDR_SEL_EEPROM from NIC's EEPROM*/
-                                                                /* AT91RM9200_EMAC_MAC_ADDR_SEL_CFG    from application.*/
-#define  AT91RM9200_EMAC_CFG_MAC_ADDR_SEL       AT91RM9200_EMAC_MAC_ADDR_SEL_CFG
-
-
 #endif

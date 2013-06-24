@@ -1,4 +1,3 @@
-
 #include <includes.h>
 #include <stdio.h>
 #include <board.h>
@@ -6,11 +5,9 @@
 #include <os_csp.h>
 #include <stdint.h>
 #include <include/trace.h>
-//#include <netservices.h>
-#include <./simudata/simudata.h>
-#include <./83/main83.h>
+#include <simudata/simudata.h>
+#include <83/main83.h>
 #include <netservices.h>
-
 
 // EMAC packet processing offset
 #define EMAC_RCV_OFFSET     0
