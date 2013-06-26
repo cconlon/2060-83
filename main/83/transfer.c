@@ -1,5 +1,4 @@
-#include "common.h"
-
+#include <stdint.h>
 #include "interface.h"
 #include "define2060.h"
 //#include "net.h"
@@ -21,7 +20,11 @@ extern INT32U		g_nChannel_Tran_Key_Data_Offset[_MAX_JKEY_CHANNEL_CNT][_MAX_TRAN_
 extern Param_Table_83		 g_83param;
 extern Param_Table_12	     g_12Param;
 
-
+typedef struct
+{
+    uint32_t len;
+    int32_t *addr;
+}dynamic_vec32;
 
 //static int32_t StaticBuffer   [1<<20];
 //static int32_t DynamicBuffer  [1<<20];
@@ -34,7 +37,7 @@ void read_RamDisk(int32_t *nbuffer, const uint32_t addr, int32_t *buffer, int32_
 while(1) {\
   rArray = EventArray[jkey].ulnTrigerRead; \
     if(rArray == EventArray[jkey].ulnTrigerWrite) { \
-      sleep_ms(ms); \
+      OSTimeDlyHMSM(0,0,0,ms); \
         if(_MAX_JKEY_CHANNEL_CNT == ++jkey) jkey = 0; \
           continue; \
     } \
@@ -108,7 +111,7 @@ void static_transfer(void * pParam)
     OSSchedLock();
     //send_data(_STATIC_CHNO, (int8_t *)StaticBuffer, sBuffer);
     OSSchedUnlock();
-    sleep_ms(20);
+    OSTimeDlyHMSM(0,0,0,20);
   }
 }
 
@@ -504,8 +507,8 @@ void realdata_transfer(void * pParam)
   int8_t ret = 0;
   int32_t time_cnt = 0;
   //_log("real_transfer\n");
-  sleep_ms(5000);
-  sleep_ms(5000);
+  OSTimeDlyHMSM(0,0,5,0);
+  OSTimeDlyHMSM(0,0,5,0);
   //len+8 len+4 ProtocolHead MrsPtTable value data
 #if 0
   while(1)

@@ -133,24 +133,6 @@ INT32S  myRead12Param(void* p12);
 INT32S  myInit83Param(void* p83in,void* p12in);
 void myMapChannel(void);
 
-OS_TCB Simu_Send_Data_tcb;
-
-OS_TCB static_transfer_tcb;
-OS_TCB dynamic_transfer_tcb;
-OS_TCB tran_transfer_tcb;
-OS_TCB realvalue_transfer_tcb;
-OS_TCB realdata_transfer_tcb;
-
-CPU_STK Simu_Send_Data_stk[TASK_STK_SIZE] @ "MYSECTION1";
-
-CPU_STK static_transfer_stk   [TASK_STK_SIZE];
-CPU_STK dynamic_transfer_stk  [TASK_STK_SIZE];
-CPU_STK tran_transfer_stk     [TASK_STK_SIZE];
-CPU_STK realvalue_transfer_stk[TASK_STK_SIZE];
-CPU_STK realdata_transfer_stk [TASK_STK_SIZE];
-
-
-
 void MapChannel()
 {
   INT32S i,j,tmp1,tmp2;

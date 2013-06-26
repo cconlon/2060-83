@@ -1,4 +1,4 @@
-#include "common.h"
+
 #include "define2060.h"
 #include "interface.h"
 #include "transfer.h"

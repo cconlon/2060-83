@@ -802,7 +802,7 @@ INT32S Simu_Send_Data(void *ps)
       
       OSSchedUnlock();//‘ –Ì»ŒŒÒ«–ªª 
       CheckSimuData();
-      sleep_ms(100);
+      OSTimeDlyHMSM(0,0,0,100);
     }
     //_log("End Send SimuData\n");
   }while(1);

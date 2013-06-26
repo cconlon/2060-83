@@ -1,4 +1,3 @@
-#include "common.h"
 #include "ucos_ii.h"
 
 OS_EVENT				*g_EventStatic;
@@ -6,10 +5,6 @@ OS_EVENT				*g_EventDynamic;
 //OS_EVENT				*g_EventTran;
 OS_EVENT				*g_EventRTData;
 
-void sleep_ms(uint32_t ms)
-{
-  OSTimeDlyHMSM(0,0,0,ms);
-}
 #if 0
 void _error(char *msg)
 {

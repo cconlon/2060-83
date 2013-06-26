@@ -1,6 +1,8 @@
 #ifndef NETIO_H
 #define NETIO_H
-#include "common.h"
+#include <os_cpu.h>
+#include <stdint.h>
+
 /*
    *********************************************************************************************************
    *                                          transfer for PCM2060/83

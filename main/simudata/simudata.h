@@ -1,7 +1,7 @@
 #ifndef SIMUDATA_H
 #define SIMUDATA_H
 
-#include "../83/common.h"
+#include <os_cpu.h>
 #define _MAX_CHCNT 64
 #define _MAX_KEYCNT 4
 #define _START_KEY_CH 48
