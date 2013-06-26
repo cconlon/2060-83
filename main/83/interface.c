@@ -1207,6 +1207,7 @@ INT32S	RenewParam(void* p83in,void* p12in)
   }
   return re;
 }
+
 //设置通道原始数据当前偏移
 INT32S	SetRamDiskChDataOffset(INT32S nStartChannel,INT32S nChannelcnt,INT32S pData[])//arm 调用，设置fpga各个通道数据在电子盘的写入地址
 {
@@ -1214,6 +1215,7 @@ INT32S	SetRamDiskChDataOffset(INT32S nStartChannel,INT32S nChannelcnt,INT32S pDa
   Mem_Copy(g_nFpgaDynamicChDataOffset+nStartChannel,pData,sizeof(INT32S)*nChannelcnt);
   return re;
 }
+
 //设置各个通道的抽样频率
 INT32S	SetChDataSampleStep(INT32S nStartChannel,INT32S nChannelcnt,INT32S pData[])
 {
@@ -1221,6 +1223,7 @@ INT32S	SetChDataSampleStep(INT32S nStartChannel,INT32S nChannelcnt,INT32S pData[
   Mem_Copy(g_nFpgaDynamicChDataSampleStep+nStartChannel,pData,sizeof(INT32S)*nChannelcnt);
   return re;
 }
+
 //arm调用读取通道数据头
 INT32S ReadChValue(Tst_Head_DCM_SigModuSampData_SYS* p,INT32S nStartChannel,INT32S nChannelcnt)
 {
@@ -1228,6 +1231,7 @@ INT32S ReadChValue(Tst_Head_DCM_SigModuSampData_SYS* p,INT32S nStartChannel,INT3
   Mem_Copy(p,g_TempValue+nStartChannel,sizeof(Tst_Head_DCM_SigModuSampData_SYS)*nChannelcnt);
   return re;
 }
+
 //arm调用读取通道原始数据
 INT32S ReadRamDisk(INT32U nOffset,INT32S pData[],INT32S nLength)
 {

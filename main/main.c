@@ -1,13 +1,14 @@
-#include <includes.h>
-#include <stdio.h>
+#include <ucos_ii.h>
 #include <board.h>
 #include <bsp.h>
 #include <os_csp.h>
+#include <lib_mem.h>
 #include <stdint.h>
 #include <include/trace.h>
-#include <simudata/simudata.h>
-#include <83/main83.h>
-#include <netservices.h>
+#include "simudata/simudata.h"
+#include "83/main83.h"
+#include "netservices.h"
+#include "app_cfg.h"
 
 // EMAC packet processing offset
 #define EMAC_RCV_OFFSET     0
@@ -78,8 +79,8 @@ int  main (void)
                 (INT8U *)"Start Task",
                 (INT8U *)&os_err);
 #endif
-  //Simu_Build();
-  //Init2060();
+  Simu_Build();
+  Init2060();
   //Start2060();
   OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)       */
 }
@@ -126,7 +127,6 @@ static  void  App_TaskStart (void *p_arg)
   }
 }
 
-
 /*
 *********************************************************************************************************
 *                                      App_ObjCreate()
@@ -145,24 +145,8 @@ static  void  App_TaskStart (void *p_arg)
 
 static  void  App_ObjCreate (void)
 {
-  
 }
 
-/*
-*********************************************************************************************************
-*                                      App_TaskCreate()
-*
-* Description : Create application Tasks.
-*
-* Argument(s) : None.
-*
-* Return(s)   : None.
-*
-* Caller(s)   : App_TaskStart()
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
 static  void  App_TaskCreate (void)
 {
   OSTaskCreate(Task0,

@@ -2,7 +2,7 @@
 #define COMMON_H
 
 #define  TASK_STK_SIZE       1024       /* Size of each task's stacks (# of WORDs)            */
-#define  N_TASKS               10       /* Number of identical tasks                          */
+#define  N_TASKS               20       /* Number of identical tasks                          */
 
 #define TaskStart_Prio			0
 
@@ -13,6 +13,8 @@
 #define Task_Prio_Flags			7
 #define Task_Prio_Flags2		8
 #define Task1_Prio		 		9// for shell
+#define Task_Prio_Simu		   17
+#define Task_Prio_Stattic	   18
 
 #include <stdint.h>
 #include <os_cpu.h>

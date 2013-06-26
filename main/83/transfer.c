@@ -23,10 +23,10 @@ extern Param_Table_12	     g_12Param;
 
 
 
-static int32_t StaticBuffer   [1<<20];
-static int32_t DynamicBuffer  [1<<20];
-static int32_t RealValueBuffer[1<<20];
-static int32_t RealDataBuffer [1<<20];
+//static int32_t StaticBuffer   [1<<20];
+//static int32_t DynamicBuffer  [1<<20];
+//static int32_t RealValueBuffer[1<<20];
+//static int32_t RealDataBuffer [1<<20];
 //static int32_t tranBuffer   [1<<25];
 void send_data(int32_t pipe, int8_t *buffer, int32_t size);
 void read_RamDisk(int32_t *nbuffer, const uint32_t addr, int32_t *buffer, int32_t len);
@@ -47,6 +47,7 @@ while(1) {\
 void realvalue_transfer(void * pParam);
 void realdata_transfer(void * pParam);
 
+#pragma segment="STATIC_BLOCK"
 void static_transfer(void * pParam)
 {
   uint32_t jkey = 0;
@@ -57,7 +58,8 @@ void static_transfer(void * pParam)
   Tst_Head_DCM_SigModuSampData_SYS* pSigModuSampData;
   ProtocolHead *pProtocolHead;
   Channel_Static_Value *pValueHead;
-
+  uint32_t *StaticBuffer = __section_begin("STATIC_BLOCK");
+  
   while(1)
   {
     WAIT_TRIGGER(jkey, rArray, g_StaticTrigerEventArray, 10)
@@ -420,6 +422,7 @@ void realvalue_transfer(void * pParam)
   int8_t ret = 0;
   int32_t time_cnt = 0;
   //_log("real_transfer\n");
+#if 0
   while(1)
   {
     OSSchedLock( );
@@ -478,6 +481,7 @@ void realvalue_transfer(void * pParam)
     
     sleep_ms(40);
   }
+#endif
 }
 
 void realdata_transfer(void * pParam)
@@ -503,6 +507,7 @@ void realdata_transfer(void * pParam)
   sleep_ms(5000);
   sleep_ms(5000);
   //len+8 len+4 ProtocolHead MrsPtTable value data
+#if 0
   while(1)
   {
     OSSchedLock();
@@ -592,6 +597,7 @@ void realdata_transfer(void * pParam)
     
     sleep_ms(200);
   }
+#endif
 }
 
 void send_data(int32_t pipe, int8_t *buffer, int32_t size) {

@@ -224,9 +224,6 @@
 
 
 #include  <net_def.h>                                   /* Network      Defines                                         */
-//#include  <net_nic_def.h>                               /* Network Card Defines                                         */
-
-#include  <app_cfg.h>                                   /* Application Configuration File (see Note #1a)                */
 #include  <net_cfg.h>                                   /* Network     Configuration File (see Note #1a)                */
 #include  <net_cfg_net.h>                               /* Network     Configuration (based on 'net_cfg.h' settings)    */
 

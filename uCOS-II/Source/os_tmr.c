@@ -1039,7 +1039,7 @@ static  void  OSTmr_Unlink (OS_TMR *ptmr)
 *********************************************************************************************************
 *                                        TIMER MANAGEMENT TASK
 *
-* Description: This task is created by OSTmrInit().
+* Description: This task is created by OSTmrInit().  //OSTmr_InitTask
 *
 * Arguments  : none
 *

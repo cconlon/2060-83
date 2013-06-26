@@ -6,41 +6,40 @@
 #include "main83.h"
 #include "netio.h"
 #include <string.h>
-//#include "../simudata//simudata.h"
-//#include <sys/stat.h>
-//
-extern INT8S						g_strHostIP[];
-extern INT32U						g_nTcpPort;
-extern INT32U						g_nUdpPort;
-extern INT32S						g_nSystemNo;//系统编号
-extern INT32S						g_nMgrNo;//机组编号
-extern INT32S						g_nMchNo[_MAX_SIGNAL_CHANNEL_CNT];//机器编号
-extern INT32S						g_nDeviceNo[_MAX_SIGNAL_CHANNEL_CNT];//虚拟设备编号
-extern const INT32S				    g_n12UpFrequency;//12模块上传数据的频率,由海淀给定,不得修改
-extern const INT32S				    g_TempAddtionalcnt;//附加临时数据组数
-extern const INT32S				    g_nMaxTranGroupDataSize;
-extern const INT32S				    g_nMaxTranDataGroup;
-extern const INT32S				    g_nMaxDataSize;
-extern const INT32S				    g_nTranGroupcnt;
+#include "app_cfg.h"
+
+extern INT8S					                g_strHostIP[];
+extern INT32U					                g_nTcpPort;
+extern INT32U					                g_nUdpPort;
+extern INT32S					                g_nSystemNo;//系统编号
+extern INT32S					                g_nMgrNo;   //机组编号
+extern INT32S					                g_nMchNo[_MAX_SIGNAL_CHANNEL_CNT];      //机器编号
+extern INT32S					                g_nDeviceNo[_MAX_SIGNAL_CHANNEL_CNT];   //虚拟设备编号
+extern const INT32S				            g_n12UpFrequency;                   //12模块上传数据的频率,由海淀给定,不得修改
+extern const INT32S				            g_TempAddtionalcnt;                 //附加临时数据组数
+extern const INT32S				            g_nMaxTranGroupDataSize;
+extern const INT32S				            g_nMaxTranDataGroup;
+extern const INT32S				            g_nMaxDataSize;
+extern const INT32S				            g_nTranGroupcnt;
 //
 extern Tst_Head_DCM_SigModuSampData_SYS		g_StaticOriginData[_MAX_STATIC_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT];//静态测量值队列
-extern Tst_Head_DCM_SigModuSampData_SYS*	g_pStaticChannelOrigin[_MAX_JKEY_CHANNEL_CNT][_MAX_STATIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT];
-extern Static_Triger_Table					g_StaticTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
+extern Tst_Head_DCM_SigModuSampData_SYS*	    g_pStaticChannelOrigin[_MAX_JKEY_CHANNEL_CNT][_MAX_STATIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT];
+extern Static_Triger_Table					    g_StaticTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
 //
 extern INT32U									g_nChannel_Dynamic_Wave_Data_Offset[_MAX_JKEY_CHANNEL_CNT][_MAX_DYNAMIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT];
 extern INT32U									g_nChannel_Dynamic_Key_Data_Offset[_MAX_JKEY_CHANNEL_CNT][_MAX_DYNAMIC_ARRAY_LTH];
 //
-extern Data_Limit_83				g_83DataLimit;//83模块的一些极限参数
-extern INT32S						g_nChannelArrivalSequenceTable[_MAX_SIGNAL_CHANNEL_CNT];//到达通道次12通道序号表
-extern INT32S						g_nArrivalDeviceNo[_MAX_SIGNAL_CHANNEL_CNT];//到达通道虚拟设备表
-extern INT32S						g_nArrivalChannelNo[_MAX_SIGNAL_CHANNEL_CNT];//通道数据到达在所属设备的通道号
-extern Param_Table_12				g_12Param;//12模块参数,从12模块读取,不保存,由12congfig模块配置,360系统不可修改
-extern Param_Table_83				g_83param;//83模块参数,存储在flash,可从上位机更新
-extern Run_Time_Flag				g_RunTimeFlag;//83运行状态信息
+extern Data_Limit_83			                g_83DataLimit;//83模块的一些极限参数
+extern INT32S					                g_nChannelArrivalSequenceTable[_MAX_SIGNAL_CHANNEL_CNT];//到达通道次12通道序号表
+extern INT32S					                g_nArrivalDeviceNo[_MAX_SIGNAL_CHANNEL_CNT];//到达通道虚拟设备表
+extern INT32S					                g_nArrivalChannelNo[_MAX_SIGNAL_CHANNEL_CNT];//通道数据到达在所属设备的通道号
+extern Param_Table_12			                g_12Param;//12模块参数,从12模块读取,不保存,由12congfig模块配置,360系统不可修改
+extern Param_Table_83			                g_83param;//83模块参数,存储在flash,可从上位机更新
+extern Run_Time_Flag			                g_RunTimeFlag;//83运行状态信息
 //
 extern Tst_Head_DCM_SigModuSampData_SYS		g_StaticOriginData[_MAX_STATIC_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT];
 extern Tst_Head_DCM_SigModuSampData_SYS*		g_pStaticChannelOrigin[_MAX_JKEY_CHANNEL_CNT][_MAX_STATIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT];
-extern INT8S  g_tmpStaticData[sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead)];
+extern INT8S g_tmpStaticData[sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead)];
 extern ProtocolHead*						    g_tmpStaticDataHead;
 extern Channel_Static_Value*					g_ptmpStaticData[_MAX_SIGNAL_CHANNEL_CNT];
 extern Static_Triger_Table						g_StaticTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
@@ -57,7 +56,7 @@ extern Channel_Dynamic_Wave_Data*				g_ptmpDynamicData[_MAX_SIGNAL_CHANNEL_CNT];
 extern INT32U									g_nChannel_Dynamic_Wave_Data_Offset[_MAX_JKEY_CHANNEL_CNT][_MAX_DYNAMIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT];
 extern INT32U									g_nChannel_Dynamic_Key_Data_Offset[_MAX_JKEY_CHANNEL_CNT][_MAX_DYNAMIC_ARRAY_LTH];
 //
-extern Tst_Head_DCM_SigModuSampData_SYS		    g_TranValue[_MAX_TRAN_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT*_MAX_TRAN_GROUP];//瞬态测量值队列
+extern Tst_Head_DCM_SigModuSampData_SYS		g_TranValue[_MAX_TRAN_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT*_MAX_TRAN_GROUP];//瞬态测量值队列
 //根据12模块的键相-通道邦定列表创建,用来快速检索瞬态态数据头
 extern Tst_Head_DCM_SigModuSampData_SYS*		g_pTranChannelValue[_MAX_JKEY_CHANNEL_CNT][_MAX_TRAN_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT][_MAX_TRAN_GROUP];
 extern Tran_Triger_Table						g_TranTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
@@ -108,7 +107,6 @@ extern INT32U*		g_nArmTranChDataSampleStep;
 //
 
 /*所有动态内存的分配和释放都在此函数进行，避免碎块产生*/
-  CPU_STK	TaskStk[N_TASKS][TASK_STK_SIZE];
 
 static INT32S InitRunTimeFlag(void);
 static INT32S AllocMemery(INT32S nDynamiccnt,INT32S nTrancnt);
@@ -1279,106 +1277,31 @@ INT32S Uninit2060()
 extern void Simu_Send_Data(void* ps);
 extern void receive_channel_data(void *arg);
 
+static CPU_STK static_transfer_stk[STATIC_TRANSFER_TASK_SIZE];
+static CPU_STK Simu_Send_Data_stk[SIMU_SEND_DATA_TASK_SIZE];
+
 INT32S Start2060()
 {
-  
   INT32S re = 0;
   RenewParam(&g_83param,&g_12Param);
   //OpenRealTimeValuePipe();
   //OpenStaticDataPipe();
   //OSTaskCreate(receive_channel_data, 0, &TaskStk[4][TASK_STK_SIZE-1], Task1_Prio+PICK_TASK_PRIO);
-  //OSTaskCreate(static_transfer, 0, &TaskStk[5][TASK_STK_SIZE-1], Task1_Prio+STATIC_TRANSFER_TASK_PRIO);
+     
+  OSTaskCreateExt(static_transfer, 0, 
+                  &static_transfer_stk[STATIC_TRANSFER_TASK_SIZE-1], STATIC_TRANSFER_TASK_PRIO, STATIC_TRANSFER_TASK_PRIO, 
+                  &static_transfer_stk[0], STATIC_TRANSFER_TASK_SIZE, 0, OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);
+  
   //OSTaskCreate(dynamic_transfer, 0, &TaskStk[6][TASK_STK_SIZE-1], Task1_Prio+DYNAMIC_TRANSFER_TASK_PRIO);
   //OSTaskCreate(tran_transfer, 0, &TaskStk[7][TASK_STK_SIZE-1], Task1_Prio+TRAN_TRANSFER_TASK_PRIO);
   //OSTaskCreate(real_time_show, 0, &TaskStk[8][TASK_STK_SIZE-1], Task1_Prio+REAL_TIME_SHOW_TASK_PRIO);
   //OSTaskCreate(real_time_show_pipe, 0, &TaskStk[8][TASK_STK_SIZE-1], Task1_Prio+REAL_TIME_SHOW_TASK_PRIO);
   
-  OSTaskCreate(Simu_Send_Data, 0, &TaskStk[2][TASK_STK_SIZE-1], Task1_Prio+RECEIVE_12DATA_TASK_PRIO);
-  OSTaskCreate(static_transfer, 0, &TaskStk[5][TASK_STK_SIZE-1], Task1_Prio+STATIC_TRANSFER_TASK_PRIO);
+  OSTaskCreateExt(static_transfer, 0, 
+                  &Simu_Send_Data_stk[SIMU_SEND_DATA_TASK_SIZE-1], SIMU_SEND_DATA_TASK_PRIO, 
+                  SIMU_SEND_DATA_TASK_PRIO, &Simu_Send_Data_stk[0], SIMU_SEND_DATA_TASK_SIZE, 0, OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);
   
-  //  OSTaskCreate(&Simu_Send_Data_tcb,
-  //               (CPU_CHAR*)"Simu_Send_Data",
-  //               (OS_TASK_PTR )Simu_Send_Data,
-  //               (void       *)0,
-  //               (OS_PRIO     )Task1_Prio+RECEIVE_12DATA_TASK_PRIO,
-  //               (CPU_STK    *)&Simu_Send_Data_stk[0],
-  //               (CPU_STK_SIZE)2048,
-  //               (CPU_STK_SIZE)TASK_STK_SIZE,
-  //               (OS_MSG_QTY  )0,
-  //               (OS_TICK     )0,
-  //               (void       *)0,
-  //               (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-  //               (OS_ERR     *)&err);
-  //  
-  //  OSTaskCreate(&static_transfer_tcb,
-  //               (CPU_CHAR*)"static_transfer",
-  //               (OS_TASK_PTR )static_transfer, 
-  //               (void       *)0,
-  //               (OS_PRIO     )Task1_Prio+STATIC_TRANSFER_TASK_PRIO,
-  //               (CPU_STK    *)&static_transfer_stk[0],
-  //               (CPU_STK_SIZE)2048,
-  //               (CPU_STK_SIZE)TASK_STK_SIZE,
-  //               (OS_MSG_QTY  )0,
-  //               (OS_TICK     )0,
-  //               (void       *)0,
-  //               (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-  //               (OS_ERR     *)&err);
-  //  
-  //  OSTaskCreate(&dynamic_transfer_tcb,
-  //               (CPU_CHAR*)"dynamic_transfer",
-  //               (OS_TASK_PTR )dynamic_transfer, 
-  //               (void       *)0,
-  //               (OS_PRIO     )Task1_Prio+DYNAMIC_TRANSFER_TASK_PRIO,
-  //               (CPU_STK    *)&dynamic_transfer_stk[0],
-  //               (CPU_STK_SIZE)2048,
-  //               (CPU_STK_SIZE)TASK_STK_SIZE,
-  //               (OS_MSG_QTY  )0,
-  //               (OS_TICK     )0,
-  //               (void       *)0,
-  //               (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-  //               (OS_ERR     *)&err);
-  //  
-  //  OSTaskCreate(&tran_transfer_tcb,
-  //               (CPU_CHAR*)"tran_transfer",
-  //               (OS_TASK_PTR )tran_transfer, 
-  //               (void       *)0,
-  //               (OS_PRIO     )Task1_Prio+TRAN_TRANSFER_TASK_PRIO,
-  //               (CPU_STK    *)&tran_transfer_stk[0],
-  //               (CPU_STK_SIZE)2048,
-  //               (CPU_STK_SIZE)TASK_STK_SIZE,
-  //               (OS_MSG_QTY  )0,
-  //               (OS_TICK     )0,
-  //               (void       *)0,
-  //               (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-  //               (OS_ERR     *)&err);
-  
-  //OSTaskCreate(&realvalue_transfer_tcb,
-  //    (CPU_CHAR*)"realvalue_transfer",
-  //    (OS_TASK_PTR )realvalue_transfer, 
-  //    (void       *)0,
-  //    (OS_PRIO     )Task1_Prio+REALVALUE_TRANSFER_TASK_PRIO,
-  //    (CPU_STK    *)&realvalue_transfer_stk[0],
-  //    (CPU_STK_SIZE)2048,
-  //    (CPU_STK_SIZE)TASK_STK_SIZE,
-  //    (OS_MSG_QTY  )0,
-  //    (OS_TICK     )0,
-  //    (void       *)0,
-  //    (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-  //    (OS_ERR     *)&err);
-  //    
-  //OSTaskCreate(&realdata_transfer_tcb,
-  //    (CPU_CHAR*)"realdata_transfer",
-  //    (OS_TASK_PTR )realdata_transfer, 
-  //    (void       *)0,
-  //    (OS_PRIO     )Task1_Prio+REALDATA_TRANSFER_TASK_PRIO,
-  //    (CPU_STK    *)&realvalue_transfer_stk[0],
-  //    (CPU_STK_SIZE)2048,
-  //    (CPU_STK_SIZE)TASK_STK_SIZE,
-  //    (OS_MSG_QTY  )0,
-  //    (OS_TICK     )0,
-  //    (void       *)0,
-  //    (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-  //    (OS_ERR     *)&err);
+  //OSTaskCreate(static_transfer, 0, &TaskStk[5][TASK_STK_SIZE-1], Task1_Prio+STATIC_TRANSFER_TASK_PRIO);
   return re;
   
 }

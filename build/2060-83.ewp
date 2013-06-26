@@ -1966,9 +1966,6 @@
       <name>$PROJ_DIR$\..\main\app_hooks.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\main\includes.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\main\main.c</name>
     </file>
     <file>
@@ -1988,6 +1985,9 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\main\os_cfg.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\main\task.h</name>
     </file>
   </group>
   <group>

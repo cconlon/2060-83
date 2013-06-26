@@ -294,6 +294,7 @@ INT32S Simu_Build_TranPlan()//创建瞬态计划
   //_log("End Build Tran Plan\n");
   return i;
 }
+
 INT32S BuildBasicSimuData()//基础信号，同步采集点数量为256，基频50%，倍频30%，次频%20
 {
   INT32S re=0,step;
@@ -405,7 +406,8 @@ INT32S Simu_BulidTran()//为各个转速创建原始数据，原始数据长度固定
     for(step=0;step<g_nDatalth;step++)
     {
       FP32 v=0.000005236*l*step;
-      p32s[step]=(sin(v)*g_fCof1x+sin(v*2)*g_fCof2x+sin(v/2)*g_fCofP5x)*g_fLevel;
+      //p32s[step]=(sin(v)*g_fCof1x+sin(v*2)*g_fCof2x+sin(v/2)*g_fCofP5x)*g_fLevel;
+      p32s[step] = v*g_fCof1x;
       p32s[step]>>=2; 
     }					
     if(l==804||l==2028||l==3000)
@@ -418,6 +420,7 @@ INT32S Simu_BulidTran()//为各个转速创建原始数据，原始数据长度固定
   //_log("End Build Tran SimuData\n");
   return re;
 }
+
 INT32S CheckSimuData()
 {
   INT32S re=0;
@@ -433,6 +436,7 @@ INT32S CheckSimuData()
   }
   return re;
 }
+
 INT32S Simu_Build()
 {
   Simu_BuildRamDisk();
@@ -500,7 +504,6 @@ INT32S	Simu_Write_ChData(INT32S nLength[],INT32S nChNo[],INT32S nCnt,
   //INT8S* pData=(INT8S*)g_pOutChData;
   //INT32S nChDataSize=sizeof(struct tagChData2060)+(_MAX_KEY_PT_CNT+g_nDatalth-1)*sizeof(INT32S);
   INT32S noKey[]={0,0,0,0};
-  
   
   for(i=0;i<_MAX_SIGNAL_CHANNEL_CNT;i++)
   {

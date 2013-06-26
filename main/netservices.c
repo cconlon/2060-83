@@ -1,19 +1,12 @@
 #include <board.h>
 #include <string.h>
 #include "netservices.h"
-#include <includes.h>
+#include    <net.h>
 /*----------------------------------------------------------------------------
 *         Definitions
 *----------------------------------------------------------------------------*/
 NET_SOCK_ADDR_IP  TestRemoteSockAddr;
 NET_SOCK_ID       TestClientSockID;
-
-#if uC_TCPIP_MODULE == DEF_ENABLED
-NET_IP_ADDR   ip;
-NET_IP_ADDR   msk;
-NET_IP_ADDR   gateway;
-NET_ERR       err;
-#endif
 
 /** Error bits for TX */
 #define EMAC_TX_ERR_BITS  \
@@ -55,9 +48,12 @@ void  Test_Tcp (void  *p_arg)
   close(TestClientSockID);
 }
 
-#if uC_TCPIP_MODULE == DEF_ENABLED
 void AppInit_TCPIP (void)
 {
+  NET_IP_ADDR   ip;
+  NET_IP_ADDR   msk;
+  NET_IP_ADDR   gateway;
+  NET_ERR       err;
   
   err     = Net_Init();                                               /* Initialize uC/TCP-IP                                     */
   
@@ -68,4 +64,4 @@ void AppInit_TCPIP (void)
   err     = NetIP_CfgAddrThisHost(ip, msk);
   err     = NetIP_CfgAddrDfltGateway(gateway);
 }
-#endif
+

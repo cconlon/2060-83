@@ -65,7 +65,7 @@
 
 #define    NET_OS_MODULE
 #include  <net.h>
-
+#include  <app_cfg.h> 
 
 /*$PAGE*/
 /*

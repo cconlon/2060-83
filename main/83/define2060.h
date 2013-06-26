@@ -689,41 +689,9 @@ typedef struct tagKeySpeedCalt
   INT32U		nSynBlockIncreaseStep[_MAX_RPM_LEVEL];//同步抽取时各阶数据块偏移递增步长
   //INT32S		nSpeed;//本次读取的速度	
 }Key_Speed_Calt;
-#define PICK_TASK_PRIO					8	
-#define STATIC_TRANSFER_TASK_PRIO		6
-#define DYNAMIC_TRANSFER_TASK_PRIO		5
-#define REALDATA_TRANSFER_TASK_PRIO		9
-#define REALVALUE_TRANSFER_TASK_PRIO	4
-#define TRAN_TRANSFER_TASK_PRIO			3
-#define COMMAND_ANALYS_TASK_PRIO		1
-#define RECEIVE_12DATA_TASK_PRIO		2
-#define REAL_TIME_SHOW_TASK_PRIO		7
 
 extern const INT32S				g_n12UpFrequency;
 
-/*
-#define _MOUDLE(X,Y,Z)   {\
-INT32U k, c, quotient=0;
-if(X < Y) 
-Z=X;
-while(X > Y)
-{
-for(k=0,c=Y;X>=c;c<<=1,k++)
-{
-if(X-c < Y)
-{
-quotient += 1<<k;
-Z = X-c;
-break;
-}        
-}
-if(X-c < Y)
-break;
-
-quotient += 1<<(k-1);
-X -= c>>1;
-}
-}*/
 INT32S Init2060();
 INT32S Start2060();
 INT32S Stop2060();

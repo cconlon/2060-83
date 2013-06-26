@@ -39,7 +39,8 @@
 
 #include  <bsp.h>
 #include  <os_cpu.h>
-#include  <includes.h>
+
+#include "board.h"
 /*
 *********************************************************************************************************
 *                                             REGISTER & BIT DEFINES

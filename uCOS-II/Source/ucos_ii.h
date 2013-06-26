@@ -41,7 +41,6 @@ extern "C" {
 *********************************************************************************************************
 */
 
-#include <app_cfg.h>
 #include <os_cfg.h>
 #include <os_cpu.h>
 
@@ -76,9 +75,10 @@ extern "C" {
 #define  OS_N_SYS_TASKS                 1u
 #endif
 
-#define  OS_TASK_STAT_PRIO  (OS_LOWEST_PRIO - 1u)       /* Statistic task priority                     */
 #define  OS_TASK_IDLE_PRIO  (OS_LOWEST_PRIO)            /* IDLE      task priority                     */
-
+#define  OS_TASK_STAT_PRIO  (OS_LOWEST_PRIO - 1u)       /* Statistic task priority                     */
+#define  OS_TASK_TMR_PRIO   (OS_LOWEST_PRIO - 2u)
+  
 #if OS_LOWEST_PRIO <= 63u
 #define  OS_EVENT_TBL_SIZE ((OS_LOWEST_PRIO) / 8u + 1u) /* Size of event table                         */
 #define  OS_RDY_TBL_SIZE   ((OS_LOWEST_PRIO) / 8u + 1u) /* Size of ready table                         */

@@ -29,9 +29,7 @@
 *********************************************************************************************************
 */
 
-#include <includes.h>
-#include "netservices.h"
-
+#include    <net.h>
 
 pHandler theRxISR_Handler;
 pHandler theTxISR_Handler;
