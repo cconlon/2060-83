@@ -244,7 +244,7 @@
 
 
 
-#include  <net_bsp.h>                                   /* Network BSP  Interface  (see Note #1a)                       */
+//#include  <net_bsp.h>                                   /* Network BSP  Interface  (see Note #1a)                       */
 #include  <net_os.h>                                    /* Network-OS   Interface  (see Note #1d)                       */
 #include  <net_if.h>                                    /* Network-Link Interface  (see Note #1e)                       */
 #include  <net_nic.h>                                   /* Network Card Interface  (see Note #1f)                       */

@@ -1,10 +1,8 @@
 #define   NET_NIC_MODULE
 #include  <net.h>
-#include  <bsp.h>
-
-#include  <include/SAM9X35.h>
+#include  <net_bsp.h> 
 #include  <net_nic.h>
-extern sEmacd gEmacd;
+ 
 static  void NetNIC_IntInit(void);
 static  void NetNIC_ISR_Handler(void);
 static  void NetNIC_RxISR_Handler(void);               /* ISR for RX interrupts.                              */
@@ -61,7 +59,8 @@ void NetNIC_ISR_Handler(void)
   OSIntEnter();
   OS_EXIT_CRITICAL()
     ;
-  EMACD_Handler2(&gEmacd, NetNIC_RxISR_Handler, NetNIC_TxISR_Handler);
+  //EMACD_Handler2(&gEmacd, NetNIC_RxISR_Handler, NetNIC_TxISR_Handler);
+  NET_EMACD_Handler2(NetNIC_RxISR_Handler, NetNIC_TxISR_Handler);
 #if (NET_NIC_CFG_INT_CTRL_EN == DEF_ENABLED)
   AIC->AIC_ICCR = 1 << ID_EMAC;
 #endif
@@ -132,7 +131,8 @@ void  NetNIC_RxPktDiscard (CPU_INT16U   size,
   }
   
   if (size > 0) {
-    EMACD_RxDiscard(&gEmacd);
+    //EMACD_RxDiscard(&gEmacd);
+  NET_EMACD_RxDiscard();
   }
   
   NET_CTR_ERR_INC(NetNIC_ErrRxPktDiscardedCtr);
@@ -163,7 +163,8 @@ void  NetNIC_TxPkt (void        *ppkt,
   }
 #endif
   
-  EMACD_Send2(&gEmacd, size);
+  //EMACD_Send2(&gEmacd, size);
+  NET_EMACD_Send2(size);
   
   if (*perr != NET_NIC_ERR_NONE) {
   NetNIC_TxPktDiscard(perr);
@@ -197,7 +198,8 @@ NET_ERR     *perr)
   }
 #endif
   
-  EMACD_TxPrepare(&gEmacd, ppkt, size);                     /* Preparte to tx pkt to AT91RM9200.                   */
+  //EMACD_TxPrepare(&gEmacd, ppkt, size);                     /* Preparte to tx pkt to AT91RM9200.                   */
+  NET_EMACD_TxPrepare(ppkt, size); 
   *perr = NET_NIC_ERR_NONE;
   if (*perr != NET_NIC_ERR_NONE) {
     NetNIC_TxPktDiscard(perr);

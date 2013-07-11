@@ -30,7 +30,7 @@
 */
 
 #include    <net.h>
-
+#include <net_bsp.h>
 pHandler theRxISR_Handler;
 pHandler theTxISR_Handler;
 
@@ -320,7 +320,7 @@ static uint8_t pTxBuffer[TX_BUFFERS * EMAC_TX_UNITSIZE] __attribute__((aligned(8
 static uint8_t pRxBuffer[RX_BUFFERS * EMAC_RX_UNITSIZE] __attribute__((aligned(8)));
 
 /** The EMAC driver instance */
-sEmacd gEmacd;
+static sEmacd gEmacd;
 
 /** The MACB driver instance */
 static Macb gMacb;
@@ -368,6 +368,7 @@ int NET_EMAC_PHY_Init(NET_ERR *perr)
     errCount++;
   }
   NetNIC_ConnStatus = DEF_YES;
+  EMAC_EnableIt(gEmacd.pHw, EMAC_IER_RCOMP | EMAC_IER_ROVR | EMAC_IER_TCOMP);
   return 0;
 }
 
@@ -402,4 +403,24 @@ uint8_t NET_EMAC_Poll(void *ppkt)
   }
   return 0;
   //return EMACD_Poll(&gEmacd, ppkt, EMAC_FRAME_LENTGH_MAX, &frmSize);
+}
+
+void NET_EMACD_Handler2(net_handler rHandler, net_handler tHandler)
+{
+  EMACD_Handler2(&gEmacd, rHandler, tHandler);
+}
+
+void NET_EMACD_RxDiscard(void) 
+{
+  EMACD_RxDiscard(&gEmacd);
+}
+
+void NET_EMACD_Send2(CPU_INT16U   size)
+{
+  EMACD_Send2(&gEmacd, size);
+}
+
+void NET_EMACD_TxPrepare(void *ppkt, CPU_INT16U  size)
+{
+  EMACD_TxPrepare(&gEmacd, ppkt, size); 
 }

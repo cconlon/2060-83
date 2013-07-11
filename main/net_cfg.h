@@ -609,7 +609,7 @@
                                                                 /* Configure socket timeout values (see Note #4) :      */
 #define  NET_SOCK_CFG_TIMEOUT_RX_Q_MS                   3000    /* Configure socket receive    queue   timeout.         */
 #define  NET_SOCK_CFG_TIMEOUT_CONN_REQ_MS              10000    /* Configure socket connection request timeout.         */
-#define  NET_SOCK_CFG_TIMEOUT_CONN_ACCEPT_MS            3000    /* Configure socket connection accept  timeout.         */
+#define  NET_SOCK_CFG_TIMEOUT_CONN_ACCEPT_MS           10000    /* Configure socket connection accept  timeout.         */
 #define  NET_SOCK_CFG_TIMEOUT_CONN_CLOSE_MS             1000    /* Configure socket connection close   timeout.         */
 
 

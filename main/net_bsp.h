@@ -55,5 +55,9 @@ void  NET_EMAC_TxPktPrepare (void        *ppkt,
 void NET_EMAC_Send(uint16_t size, NET_ERR *perr);
 void NET_EMAC_EMAC_RxPktDiscard(void);
 void NET_EMAC_IntEn(void);
-
+typedef void (*net_handler)(void);
+void NET_EMACD_Handler2(net_handler rHandler, net_handler tHandler);
+void NET_EMACD_RxDiscard(void);
+void NET_EMACD_Send2(CPU_INT16U   size);
+void NET_EMACD_TxPrepare(void *ppkt, CPU_INT16U  size);
 #endif

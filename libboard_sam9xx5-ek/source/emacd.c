@@ -198,7 +198,8 @@ void EMACD_Handler2( sEmacd *pEmacd,pHandler pRxHandler, pHandler pTxHandler )
     }
     /* Clear status */
     EMAC_ClearRxStatus(pHw, rxStatusFlag);
-    pRxHandler();
+    //if(rxStatusFlag == EMAC_RSR_REC)
+      pRxHandler();
   }
   
   /* TX packet */

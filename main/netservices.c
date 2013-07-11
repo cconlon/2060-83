@@ -1,51 +1,79 @@
 #include <board.h>
 #include <string.h>
 #include "netservices.h"
-#include    <net.h>
+#include <net.h>
+
 /*----------------------------------------------------------------------------
 *         Definitions
 *----------------------------------------------------------------------------*/
-NET_SOCK_ADDR_IP  TestRemoteSockAddr;
-NET_SOCK_ID       TestClientSockID;
 
-/** Error bits for TX */
-#define EMAC_TX_ERR_BITS  \
-(EMAC_TXD_bmERROR | EMAC_TXD_bmUNDERRUN | EMAC_TXD_bmEXHAUSTED)
-#if 0
-#define  REMOTE_HOST_ADDR                 (((NET_IP_ADDR)10u << (3u * DEF_OCTET_NBR_BITS)) | \
-((NET_IP_ADDR)217u << (2u * DEF_OCTET_NBR_BITS)) | \
-  ((NET_IP_ADDR)  3u << (1u * DEF_OCTET_NBR_BITS)) | \
-    ((NET_IP_ADDR)200u << (0u * DEF_OCTET_NBR_BITS)))
-#endif
-extern sEmacd gEmacd;
+
+int channel_open(char *const addr, int port)
+{
+  int ret;
+  struct sockaddr_in  ServerAddr;
+//  struct sockaddr_in  ClientAddr;
+//  int       ServerID;
+  int       ClientID;
+  Mem_Set(&ServerAddr, (CPU_CHAR)0, sizeof(ServerAddr) );
+  ServerAddr.sin_family = AF_INET;
+  ServerAddr.sin_port = htons(port);
+  ServerAddr.sin_addr.s_addr = inet_addr (addr);
+  ClientID = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if(-1 == ClientID)
+    return -1;
+  ret = connect(ClientID, (struct sockaddr*)&ServerAddr, sizeof(ServerAddr));
+  if(-1 == ret)
+    return -1;
+  else
+    return ClientID;
+}
+
+int channel_write(int fd, void* data, size_t len) {
+  return send(fd, data, len, NET_SOCK_FLAG_NONE);
+}
+
 void  Test_Tcp (void  *p_arg)
 {
-  NET_ERR            err;
-  uint32_t cnt = 0;
+  struct sockaddr_in  ServerAddr;
+  struct sockaddr_in  ClientAddr;
+  int       ServerID;
+  int       ClientID;
   uint8_t buff[1024];
   int32_t len = 0;
-  Mem_Set(&TestRemoteSockAddr, (CPU_CHAR)0, NET_SOCK_ADDR_IP_SIZE);
-  TestRemoteSockAddr.AddrFamily = NET_SOCK_ADDR_FAMILY_IP_V4;
-  TestRemoteSockAddr.Port = NET_UTIL_HOST_TO_NET_16(50001);
-  //TestRemoteSockAddr.Addr = NET_UTIL_HOST_TO_NET_32(REMOTE_HOST_ADDR); 
-  TestRemoteSockAddr.Addr = htonl(NetASCII_Str_to_IP("10.217.3.200", &err));
-  EMAC_EnableIt(gEmacd.pHw, EMAC_IER_RCOMP | EMAC_IER_ROVR | EMAC_IER_TCOMP);
-  TestClientSockID = socket(AF_INET, SOCK_STREAM, NET_SOCK_PROTOCOL_TCP);  //NET_SOCK_ADDR_FAMILY_IP_V4
-  connect(TestClientSockID, (struct sockaddr*)&TestRemoteSockAddr, sizeof(struct  sockaddr));
-  //NetSock_CfgTimeoutRxQ_Set(TestClientSockID,100000, &err);
-  if(TestClientSockID == 0)
-    return;
-  send(TestClientSockID,"abcdefghij1234567890ABCDEFGHIJabcdefghij1234567890ABCDEFGHIJabcdefghij1234567890ABCDEFGHIJabcdefghij1234567890ABCDEFGHIJabcdefghij1234567890ABCDEFGHIJabcdefghij1234567890ABCDEFGHIJabcdefghij1234567890ABCDEFGHIJabcdefghij1234567890ABCDEFGHIJ",240,NET_SOCK_FLAG_NONE);
+  socklen_t client_len = sizeof(ClientAddr);
+  Mem_Set(&ServerAddr, (CPU_CHAR)0, sizeof(ServerAddr) );
+  ServerAddr.sin_family = AF_INET;
+  ServerAddr.sin_port = htons(50002);
+  ServerAddr.sin_addr.s_addr = inet_addr ("10.217.3.168");
+  
+  ServerID = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); 
+  
+  //connect(TestClientSockID, (struct sockaddr*)&TestRemoteSockAddr, sizeof(struct  sockaddr));
+  bind(ServerID, (struct sockaddr*)&ServerAddr, sizeof(struct  sockaddr));
+  listen(ServerID, 10);
+  ClientID = accept(ServerID, (struct sockaddr*)&ClientAddr, &client_len);
+  
+  assert(ClientID != -1);
+  send(ClientID,"abcdefghijklmnopqrstuvwxyz", 26, NET_SOCK_FLAG_NONE);
   
   while(1) {
-    if((len = recv(TestClientSockID, buff, 1024, 0)) > 0)
-    {
-      send(TestClientSockID,buff,len,NET_SOCK_FLAG_NONE);
-    }
-    OSTimeDly(100);
     
+    len = recv(ClientID, buff, 1024, 0);
+    
+    if(len > 0)
+    {
+      //OSTimeDlyHMSM(0,0,1,0);
+      send(ClientID,buff,len,NET_SOCK_FLAG_NONE);
+    }
+    if(len == 1)
+    {
+      break;
+    }
+    
+    OSTimeDlyHMSM(0,0,1,0);
   }
-  close(TestClientSockID);
+  //close(TestClientSockID);
 }
 
 void AppInit_TCPIP (void)

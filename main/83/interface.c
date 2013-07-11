@@ -535,7 +535,7 @@ INT32S Simu12Param(void* p12)
   //memset(p->nMrsPtDataSize, 0, sizeof(INT32S)*_MAX_SIGNAL_CHANNEL_CNT);
   Mem_Clr(p->nMrsPtDataSize,  sizeof(INT32S)*_MAX_SIGNAL_CHANNEL_CNT);
   Mem_Clr(p->nMrsPtDataSize0,  sizeof(INT32S)*_MAX_SIGNAL_CHANNEL_CNT);
-#if 0  
+
   p->nDeviceNo=206;	//设备序号;
   p->nDeviceProperty=2060;	//设备属性；0 数据采集卡 6 过程量输入模块 4 电流模块 5 继电器模块；
   p->nDeviceTypeID=2060;	//设备类型ID;
@@ -749,7 +749,6 @@ INT32S Simu12Param(void* p12)
     p->SignalChannel[i].nCalcMode=0;//传感器类型,用于上位机	否	INT32U 	0~2	不积分、一次积分、二次积分		
     p->SignalChannel[i].nOutputMode=1;
   }
-#endif 
   return re;
 }
 #endif

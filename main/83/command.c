@@ -2,9 +2,8 @@
 #include "define2060.h"
 #include "interface.h"
 #include "transfer.h"
-//#include "net.h"
 #include "ucos_ii.h"
-//#include "os_cfg_app.h"
+
 
 extern INT32S					g_nSystemNo;//系统编号
 extern INT32S					g_nMgrNo;//机组编号

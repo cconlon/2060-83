@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "interface.h"
 #include "define2060.h"
-//#include "net.h"
+#include "netservices.h"
 #include "ucos_ii.h"
 #include "lib_mem.h"
 
@@ -57,16 +57,29 @@ void static_transfer(void * pParam)
   int32_t rArray;
   int32_t channel = 0;
   uint32_t sBuffer = 0;
-
+  int fd;
   Tst_Head_DCM_SigModuSampData_SYS* pSigModuSampData;
   ProtocolHead *pProtocolHead;
   Channel_Static_Value *pValueHead;
   uint32_t *StaticBuffer = __section_begin("STATIC_BLOCK");
   
+  fd = channel_open("10.217.3.200", 50001);
   while(1)
   {
-    WAIT_TRIGGER(jkey, rArray, g_StaticTrigerEventArray, 10)
-      ;
+    while(1) {
+      rArray = g_StaticTrigerEventArray[jkey].ulnTrigerRead;
+      if(rArray == g_StaticTrigerEventArray[jkey].ulnTrigerWrite) {
+        //OSTimeDlyHMSM(0,0,0,100);
+        OSTimeDly(2);
+        if(_MAX_JKEY_CHANNEL_CNT == ++jkey) jkey = 0;
+        continue;
+      }
+      else {
+        break;
+      } 
+    }
+    //WAIT_TRIGGER(jkey, rArray, g_StaticTrigerEventArray, 50)
+    //  ;
     
     OSSchedLock();
     sBuffer = sizeof(ProtocolHead) + (g_83param.Device[jkey].nSignChannelNum*sizeof(Channel_Static_Value));
@@ -108,10 +121,13 @@ void static_transfer(void * pParam)
     g_StaticTrigerEventArray[jkey].ulnTrigerRead = rArray;
     OSSchedUnlock();
     
+    channel_write(fd, StaticBuffer, sBuffer);
+    /*
     OSSchedLock();
-    //send_data(_STATIC_CHNO, (int8_t *)StaticBuffer, sBuffer);
+    send_data(_STATIC_CHNO, (int8_t *)StaticBuffer, sBuffer);
     OSSchedUnlock();
-    OSTimeDlyHMSM(0,0,0,20);
+    */
+    OSTimeDlyHMSM(0,0,2,0);
   }
 }
 

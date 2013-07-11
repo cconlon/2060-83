@@ -37,7 +37,8 @@ mode=0
 Bp0=_ 1 "STD_CODE2" "{$PROJ_DIR$\..\..\source\dbgu_console.c}.132.1" 0 0 1 "" 0 ""
 Bp1=_ 1 "STD_CODE2" "{$PROJ_DIR$\..\..\source\dbgu_console.c}.167.1" 0 0 1 "" 0 ""
 Bp2=_ 1 "STD_CODE2" "{$PROJ_DIR$\..\..\source\trace.c}.57.1" 0 0 1 "" 0 ""
-Count=3
+Bp3=_ 1 "STD_CODE2" "{$PROJ_DIR$\..\..\source\emacd.c}.588.1" 0 0 1 "" 0 ""
+Count=4
 [Interrupts]
 Enabled=1
 [MemoryMap]

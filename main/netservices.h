@@ -10,6 +10,7 @@ uint8_t NET_Send( sEmacd *pEmacd,
                     uint32_t size,
                     fEmacdTransferCallback fTxCb );
 void  Test_Tcp (void  *p_arg);
-
+int channel_open(char *const addr, int port);
+int channel_write(int fd, void* data, size_t len);
 #endif //  _NETSERVICES_H_
 

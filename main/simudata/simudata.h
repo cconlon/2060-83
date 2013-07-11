@@ -45,8 +45,7 @@ INT32S Simu_BulidTran(void);
 INT32S CheckSimuData(void);
 INT32S Simu_Build(void);
 INT32S Simu_BulidTran(void);
-INT32S	Simu_Begin_Read(void);
-INT32S	Simu_End_Read(void);
+
 INT32S WriteRamDisk(INT32U nOffset,INT32S pData[],INT32S nLength);
 INT32S	Simu_Write_ChData(INT32S nLength[],INT32S nChNo[],INT32S nCnt,
                           INT32U nDynamicChDataOffset[],INT32U nDynamicKeyOffset[],INT32U nDynamicStep[],

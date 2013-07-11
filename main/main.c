@@ -81,7 +81,7 @@ int  main (void)
 #endif
   Simu_Build();
   Init2060();
-  //Start2060();
+  Start2060();
   OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)       */
 }
 
@@ -115,15 +115,18 @@ static  void  App_TaskStart (void *p_arg)
   App_SerialInit();
 #endif
   App_ObjCreate();                                            /* Create application objects                               */
-  App_TaskCreate();                                           /* Create application tasks                                 */
-  
+  App_TaskCreate();                                           /* Create application tasks                                 */ 
+  AppInit_TCPIP();
   LED_Clear(0);
   LED_Clear(1);
-  AppInit_TCPIP();
+  int i=0;
+  char buff[16];
   while (DEF_TRUE) {                                          /* Task body, always written as an infinite loop.           */
     LED_Toggle(0);
     LED_Toggle(1);
-    OSTimeDlyHMSM(0, 0, 1, 0);   
+    sprintf(buff,"i=%d ",i++);
+    printf(buff);
+    OSTimeDlyHMSM(0, 0, 5, 0);   
   }
 }
 
@@ -152,15 +155,16 @@ static  void  App_TaskCreate (void)
   OSTaskCreate(Task0,
                NULL,
                (OS_STK *)&Task0Stk[MY_TASK_STK_SIZE - 1],
-               APP_CFG_TASK_START_PRIO+4);
+               APP_TASK0_TASK_PRIO);
   
 }
 
 static  void  Task0 (void *p_arg)
 {
   p_arg = p_arg;
-  OSTimeDlyHMSM(0, 0, 1, 0);
-  Test_Tcp(NULL);
+//  OSTimeDlyHMSM(0, 0, 5, 0);
+//  AppInit_TCPIP();
+//  Test_Tcp(NULL);
   while (DEF_TRUE) {                                  /* Task body, always written as an infinite loop.  */
     LED_Toggle(0);
     

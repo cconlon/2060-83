@@ -45,21 +45,22 @@
 *********************************************************************************************************
 */
 
-#define  APP_CFG_TASK_START_PRIO                          2u
-#define  SIMU_SEND_DATA_TASK_PRIO                         3u
+#define NET_OS_CFG_IF_RX_TASK_PRIO                      28u
+#define NET_OS_CFG_TMR_TASK_PRIO                        29u
 
-#define  NET_OS_CFG_IF_RX_TASK_PRIO                      28u
-#define  NET_OS_CFG_TMR_TASK_PRIO                        29u
+#define SIMU_SEND_DATA_TASK_PRIO                         4u
+#define APP_TASK0_TASK_PRIO                              5u
+#define APP_CFG_TASK_START_PRIO                          6u
 
-#define PICK_TASK_PRIO					8	
-#define STATIC_TRANSFER_TASK_PRIO		6
-#define DYNAMIC_TRANSFER_TASK_PRIO		5
-#define REALDATA_TRANSFER_TASK_PRIO		9
-#define REALVALUE_TRANSFER_TASK_PRIO	4
-#define TRAN_TRANSFER_TASK_PRIO			3
-#define COMMAND_ANALYS_TASK_PRIO		1
-#define RECEIVE_12DATA_TASK_PRIO		2
-#define REAL_TIME_SHOW_TASK_PRIO		7
+#define PICK_TASK_PRIO					 8u	
+#define STATIC_TRANSFER_TASK_PRIO		 9u
+#define DYNAMIC_TRANSFER_TASK_PRIO		10u
+#define REALDATA_TRANSFER_TASK_PRIO		11u
+#define REALVALUE_TRANSFER_TASK_PRIO	12u
+#define TRAN_TRANSFER_TASK_PRIO			13u
+#define COMMAND_ANALYS_TASK_PRIO		14u
+#define RECEIVE_12DATA_TASK_PRIO		15u
+#define REAL_TIME_SHOW_TASK_PRIO		16u
 
 /*
 *********************************************************************************************************
@@ -70,6 +71,7 @@
 #define DYNAMIC_TRANSFER_TASK_SIZE                  	1024u
 #define SIMU_SEND_DATA_TASK_SIZE                        1024u
 
+#define APP_TASK0_TASK_SIZE                            1024u
 #define  APP_CFG_TASK_START_STK_SIZE                   1024u
 #define  NET_OS_CFG_IF_RX_TASK_STK_SIZE                1024u
 #define  NET_OS_CFG_TMR_TASK_STK_SIZE                  1024u

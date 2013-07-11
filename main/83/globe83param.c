@@ -28,8 +28,8 @@ Data_Limit_83				g_83DataLimit;//83模块的一些极限参数
 INT32S						g_nChannelArrivalSequenceTable[_MAX_SIGNAL_CHANNEL_CNT];//到达通道次12通道序号表
 INT32S						g_nArrivalDeviceNo[_MAX_SIGNAL_CHANNEL_CNT];//到达通道虚拟设备表
 INT32S						g_nArrivalChannelNo[_MAX_SIGNAL_CHANNEL_CNT];//通道数据到达在所属设备的通道号
-Param_Table_12				g_12Param @ "MYSECTION1";//12模块参数,从12模块读取,不保存,由12congfig模块配置,360系统不可修改
-Param_Table_83				g_83param @ "MYSECTION1";//83模块参数,存储在flash,可从上位机更新
+Param_Table_12				g_12Param @ "G_SECTION";//12模块参数,从12模块读取,不保存,由12congfig模块配置,360系统不可修改
+Param_Table_83				g_83param @ "G_SECTION";//83模块参数,存储在flash,可从上位机更新
 Run_Time_Flag				g_RunTimeFlag;//83运行状态信息
 
 /*三种数据以所绑定的键相号作为内存划分的基础，从外到里按照键相号-触发时间-虚拟通道序号组织*/
@@ -39,24 +39,24 @@ Run_Time_Flag				g_RunTimeFlag;//83运行状态信息
 
 /*静态数据所耗内存很小，采用静态分配，静态数据主要以报警方式触发，特定时间戳的数据到达时，一个通道报警，
 与其同键相的通道一起进行采集,采集完成后所属键相的静态触发序号加1*/
-Tst_Head_DCM_SigModuSampData_SYS		g_StaticOriginData[_MAX_STATIC_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT] @ "MYSECTION1";//静态测量值队列
+Tst_Head_DCM_SigModuSampData_SYS		g_StaticOriginData[_MAX_STATIC_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT] @ "G_SECTION";//静态测量值队列
 //根据12模块的键相-通道邦定列表创建,用来快速检索静态数据
-Tst_Head_DCM_SigModuSampData_SYS*		g_pStaticChannelOrigin[_MAX_JKEY_CHANNEL_CNT][_MAX_STATIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT] @ "MYSECTION1";
+Tst_Head_DCM_SigModuSampData_SYS*		g_pStaticChannelOrigin[_MAX_JKEY_CHANNEL_CNT][_MAX_STATIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT] @ "G_SECTION";
 //INT8S*									g_tmpStaticData;//待发送静态数据
-INT8S  g_tmpStaticData[sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead)] @ "MYSECTION1";
+INT8S  g_tmpStaticData[sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead)] @ "G_SECTION";
 ProtocolHead*						    g_tmpStaticDataHead;
 Channel_Static_Value*					g_ptmpStaticData[_MAX_SIGNAL_CHANNEL_CNT];
 Static_Triger_Table						g_StaticTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
 
 /*动态数据所耗内存较大，采用动态分配，动态数据主要以报警方式触发，特定时间戳的数据到达时，一个通道报警，
 与其同键相的通道一起进行采集，每个时间戳下采集动态数据的通道数量是不同的,采集完成后所属键相的动态触发序号加1*/
-Tst_Head_DCM_SigModuSampData_SYS		g_DynamicValue[_MAX_DYNAMIC_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT] @ "MYSECTION1";//动态态测量值队列
+Tst_Head_DCM_SigModuSampData_SYS		g_DynamicValue[_MAX_DYNAMIC_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT] @ "TST_Head_DCM_SECTION";//动态态测量值队列
 //根据12模块的键相-通道邦定列表创建,用来快速检索动态数据头
-Tst_Head_DCM_SigModuSampData_SYS*		g_pDynamicChannelValue[_MAX_JKEY_CHANNEL_CNT][_MAX_DYNAMIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT] @ "MYSECTION1";
+Tst_Head_DCM_SigModuSampData_SYS*		g_pDynamicChannelValue[_MAX_JKEY_CHANNEL_CNT][_MAX_DYNAMIC_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT] @ "TST_Head_DCM_SECTION";
 Dynamic_Triger_Table					g_DynamicTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
 //INT8S*									g_tmpDynamicData;//待发送动态数据
 //INT8S                                   g_tmpDynamicData[(sizeof(INT32S)*_DYAMIC_BUFFER_LTH+sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead))];
-INT8S                                   g_tmpDynamicData[sizeof(INT32S)*_DYAMIC_BUFFER_LTH+sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead)] @ "MYSECTION1";
+INT8S                                   g_tmpDynamicData[sizeof(INT32S)*_DYAMIC_BUFFER_LTH+sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead)] @ "G_SECTION";
 
 ProtocolHead*						    g_tmpDynamicDataHead;
 Channel_Dynamic_Value*					g_ptmpDynamicValue[_MAX_SIGNAL_CHANNEL_CNT];//待发送动态数据测量值
@@ -68,10 +68,10 @@ INT32U									g_nChannel_Dynamic_Key_Data_Offset[_MAX_JKEY_CHANNEL_CNT][_MAX_DY
 /*瞬态数据所耗内存很大,采用动态分配,根据虚拟设备划分为不同设备数据区域,瞬态数据队列长度最大不超过_MAX_TRAN_ARRAY_LTH，
 最少为1，称为组数，设备数据以组号为依据划分为同等大小的区域,组内再按照通道序号细分,通道内部以触发次序再次细分
 */
-Tst_Head_DCM_SigModuSampData_SYS		g_TranValue[_MAX_TRAN_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT*_MAX_TRAN_GROUP] @ "MYSECTION1";//瞬态测量值队列
+Tst_Head_DCM_SigModuSampData_SYS		g_TranValue[_MAX_TRAN_ARRAY_LTH*_MAX_SIGNAL_CHANNEL_CNT*_MAX_TRAN_GROUP] @ "TST_Head_DCM_SECTION";//瞬态测量值队列
 //根据12模块的键相-通道邦定列表创建,用来快速检索瞬态态数据头
-Tst_Head_DCM_SigModuSampData_SYS*		g_pTranChannelValue[_MAX_JKEY_CHANNEL_CNT][_MAX_TRAN_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT][_MAX_TRAN_GROUP] @ "MYSECTION1";
-Tran_Triger_Table						g_TranTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
+Tst_Head_DCM_SigModuSampData_SYS*		g_pTranChannelValue[_MAX_JKEY_CHANNEL_CNT][_MAX_TRAN_ARRAY_LTH][_MAX_SIGNAL_CHANNEL_CNT][_MAX_TRAN_GROUP] @ "TST_Head_DCM_SECTION";
+Tran_Triger_Table						g_TranTrigerEventArray[_MAX_JKEY_CHANNEL_CNT] @ "G_SECTION";
 //INT8S*									g_tmpTranData;//待发送瞬态数据
 INT8S  g_tmpTranData[(sizeof(INT32S)*_TRAN_BUFFER_LTH+sizeof(struct tagChValue)*_MAX_SIGNAL_CHANNEL_CNT+sizeof(ProtocolHead))];
 

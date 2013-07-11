@@ -537,13 +537,12 @@ void receive_channel_data(void *arg)
         g_nArmDynamicKeyDataOffset[nDevice]=g_nChannel_Dynamic_Key_Data_Offset[nDevice][tmp1];
       else
         g_nArmDynamicKeyDataOffset[nDevice]+=g_83param.Device[nDevice].nChKeyBlockSize;
-
     }		
   }
   //通知FPGA修改各个通道的动态和瞬态数据RAMDISK写入地址
-  SetRamDiskChDataOffset(0,_MAX_SIGNAL_CHANNEL_CNT+_MAX_JKEY_CHANNEL_CNT,g_nArmDynamicChDataOffset);
-  SetRamDiskChDataOffset(_MAX_SIGNAL_CHANNEL_CNT+_MAX_JKEY_CHANNEL_CNT,
-    _MAX_SIGNAL_CHANNEL_CNT+_MAX_JKEY_CHANNEL_CNT,g_nArmTranChDataOffset);
+  //czx SetRamDiskChDataOffset(0,_MAX_SIGNAL_CHANNEL_CNT+_MAX_JKEY_CHANNEL_CNT,g_nArmDynamicChDataOffset);
+  //czx SetRamDiskChDataOffset(_MAX_SIGNAL_CHANNEL_CNT+_MAX_JKEY_CHANNEL_CNT,
+  //  _MAX_SIGNAL_CHANNEL_CNT+_MAX_JKEY_CHANNEL_CNT,g_nArmTranChDataOffset);
   g_nIndexInGroupSequency++;
   if(g_nIndexInGroupSequency==g_nGroupCnt)
     g_nIndexInGroupSequency=0;
