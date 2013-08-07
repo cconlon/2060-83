@@ -33,7 +33,62 @@ static  void  App_ObjCreate    (void);
 static  void  App_TaskCreate   (void);
 static  void  Task0 (void *p_arg);
 
+#define ICACHE_MASK	(INT32U)(1 << 12)
+#define DCACHE_MASK	(INT32U)(1 << 2)
 
+INT32U  cp15_rd (void);
+void cache_enable(INT32U bit);
+void cache_disable(INT32U bit);
+
+INT32U  cp15_rd (void)
+{
+    __asm("mrc p15, 0, r0, c1, c0, 0");
+}
+
+void cache_enable(INT32U bit)
+{
+  __asm("mrc p15, 0, r1, c1, c0, 0 \n"
+        "orr r1, r1, r0 \n"
+        "mcr p15, 0, r1, c1, c0, 0");
+}
+
+void cache_disable(INT32U bit)
+{
+  __asm("mrc p15, 0, r1, c1, c0, 0 \n"
+        "bic r1, r1, r0 \n"
+        "mcr p15, 0, r1, c1, c0, 0");
+}
+int tmd2(int a,int b);
+int tmd3(int a,int b,int c);
+int tmd4(int a,int b,int c,int d);
+
+int tmd2(int a,int b)
+{
+  int sum = 0;
+ 
+  int A[] = {1,2,3,10,20,30,100,200,300};
+  for(int k=0;k<9;k++)
+  {
+    sum += A[k];
+  }
+  sum -= a;
+  sum -= b;
+  return sum;
+}
+int tmd3(int a,int b,int c)
+{
+  return a+b+c;
+}
+int tmd4(int a,int b, int c, int d)
+{
+  int tmp1 = 0;
+  int tmp2 = 0;
+  int tmp;
+  tmp1 = a*a+b*b;
+  tmp2 = c*c+d*d;
+  tmp += tmd2(tmp1, tmp2);
+  return tmp;
+}
 int  main (void)
 {
 #if (OS_TASK_NAME_EN == DEF_ENABLED)
@@ -48,6 +103,15 @@ int  main (void)
               (CPU_ERR  *)&cpu_err);
 #endif    
   WDT_Disable(WDT);
+  tmd4(5, 10, 20, 30);
+  INT32U cp15_value = cp15_rd();
+  cache_enable(ICACHE_MASK);
+  cache_disable(ICACHE_MASK);
+  cache_enable(ICACHE_MASK);
+  
+  cache_enable(DCACHE_MASK);
+  cache_disable(DCACHE_MASK);
+  cache_enable(DCACHE_MASK);
   
   BSP_PreInit();                                              /* System pre-initialization.                               */
   BSP_PostInit();
@@ -63,7 +127,7 @@ int  main (void)
   
   OS_CSP_TickInit();
   OSInit();                                                   /* Initialize "uC/OS-II, The Real-Time Kernel"              */
-  
+  AppInit_TCPIP();
   OSTaskCreateExt((void (*)(void *)) App_TaskStart,           /* Create the start task                                    */
                   (void           *) 0,
                   (OS_STK         *)&App_TaskStartStk[APP_CFG_TASK_START_STK_SIZE - 1],
@@ -80,8 +144,8 @@ int  main (void)
                 (INT8U *)&os_err);
 #endif
   Simu_Build();
-  Init2060();
-  Start2060();
+  //Init2060();
+  //Start2060();
   OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)       */
 }
 
@@ -101,7 +165,11 @@ int  main (void)
 * Note(s)     : None.
 *********************************************************************************************************
 */
-
+//extern WEAK signed int putchar( signed int c )
+//{
+//  DBGU_PutChar( c ) ;
+//  return c ;
+//}
 static  void  App_TaskStart (void *p_arg)
 {
   (void)p_arg;
@@ -116,7 +184,7 @@ static  void  App_TaskStart (void *p_arg)
 #endif
   App_ObjCreate();                                            /* Create application objects                               */
   App_TaskCreate();                                           /* Create application tasks                                 */ 
-  AppInit_TCPIP();
+  
   LED_Clear(0);
   LED_Clear(1);
   int i=0;
@@ -162,12 +230,12 @@ static  void  App_TaskCreate (void)
 static  void  Task0 (void *p_arg)
 {
   p_arg = p_arg;
-//  OSTimeDlyHMSM(0, 0, 5, 0);
-//  AppInit_TCPIP();
-//  Test_Tcp(NULL);
+  OSTimeDlyHMSM(0, 0, 5, 0);
+  //  AppInit_TCPIP();
+  //  Test_Tcp(NULL);
+
   while (DEF_TRUE) {                                  /* Task body, always written as an infinite loop.  */
     LED_Toggle(0);
-    
-    OSTimeDlyHMSM(0, 0, 30, 0);
+    OSTimeDlyHMSM(0, 0, 2, 0);
   }
 }

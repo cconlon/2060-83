@@ -33,6 +33,11 @@ int channel_write(int fd, void* data, size_t len) {
   return send(fd, data, len, NET_SOCK_FLAG_NONE);
 }
 
+int channel_close(int fd) {
+  close(fd);
+  return 0;
+}
+
 void  Test_Tcp (void  *p_arg)
 {
   struct sockaddr_in  ServerAddr;

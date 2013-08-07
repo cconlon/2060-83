@@ -43,7 +43,8 @@ extern INT32U		g_nFpgaDynamicChDataOffset[];
 extern INT32U		g_nFpgaDynamicChDataSampleStep[];
 //extern INT32U*		g_nFpgaTranChDataSampleStep;
 extern Tst_Head_DCM_SigModuSampData_SYS g_TempValue[_MAX_SIGNAL_CHANNEL_CNT];//来自于FPGA数据头的临时存储区域
-extern INT8S* g_pChData;
+
+extern INT8S g_pChData[0x1000000];
 
 extern INT32S		g_nCaltKeySpeed[_MAX_JKEY_CHANNEL_CNT];
 INT32S Simu12Param(void* p12);
@@ -1235,7 +1236,8 @@ INT32S ReadChValue(Tst_Head_DCM_SigModuSampData_SYS* p,INT32S nStartChannel,INT3
 INT32S ReadRamDisk(INT32U nOffset,INT32S pData[],INT32S nLength)
 {
   INT32S re=0;
-  Mem_Copy(pData,g_pChData+nOffset,nLength);
+  //Mem_Copy(pData,g_pChData+nOffset,nLength);
+  memcpy(pData,g_pChData+nOffset,nLength);
   return re;
 }
 

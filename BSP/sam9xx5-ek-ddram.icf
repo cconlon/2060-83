@@ -2,42 +2,66 @@
 /*-Editor annotation file-*/
 /* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\a_v1_0.xml" */
 /*-Specials-*/
-define symbol __ICFEDIT_intvec_start__ = 0x00300000;
+//define symbol __ICFEDIT_intvec_start__ = 0x00300000;
 /*-Memory Regions-*/
 define symbol __ICFEDIT_region_RAM_start__   = 0x300000;
 define symbol __ICFEDIT_region_RAM_end__     = 0x307FFF;
+define symbol __ICFEDIT_region_VEC_start__   = 0x300000;
+define symbol __ICFEDIT_region_VEC_end__     = 0x30003F;
+define symbol __ICFEDIT_region_RODATA_start__= 0x300040;
+define symbol __ICFEDIT_region_RODATA_end__  = 0x300FFF;
+define symbol __ICFEDIT_region_CODE_start__  = 0x301000;
+define symbol __ICFEDIT_region_CODE_end__    = 0x303FFF;
+
+
 define symbol __ICFEDIT_region_DDRAM_start__ = 0x20000000;
 define symbol __ICFEDIT_region_DDRAM_end__   = 0x27FFFFFF;
+define symbol __ICFEDIT_region_RO_start__	 = 0x20000002;
+define symbol __ICFEDIT_region_RO_end__  	 = 0x2003FFFF;
+define symbol __ICFEDIT_region_STK_start__	 = 0x20040000;
+define symbol __ICFEDIT_region_STK_end__  	 = 0x20047FFF;
+define symbol __ICFEDIT_region_BSS_start__	 = 0x20048000;
+define symbol __ICFEDIT_region_BSS_end__  	 = 0x201FFFFF;
+define symbol __ICFEDIT_region_DATA_start__	 = 0x20200000;
+define symbol __ICFEDIT_region_DATA_end__  	 = 0x202FFFFF;
+
+
 /*-Sizes-*/
-define symbol __ICFEDIT_size_cstack__   = 0x40000;
-define symbol __ICFEDIT_size_svcstack__ = 0x600;
-define symbol __ICFEDIT_size_irqstack__ = 0x400;
-define symbol __ICFEDIT_size_fiqstack__ = 0x400;
-define symbol __ICFEDIT_size_undstack__ = 0x400;
-define symbol __ICFEDIT_size_abtstack__ = 0x400;
-define symbol __ICFEDIT_size_heap__     = 0x2000;
+define symbol __ICFEDIT_size_fiqstack__ = 0x200;
+define symbol __ICFEDIT_size_irqstack__ = 0x200;
+define symbol __ICFEDIT_size_svcstack__ = 0x200;
+define symbol __ICFEDIT_size_abtstack__ = 0x100;
+define symbol __ICFEDIT_size_undstack__ = 0x100;
+
+define symbol __ICFEDIT_size_cstack__   = 0x800;
+define symbol __ICFEDIT_size_heap__     = 0x100;
 define symbol __ICFEDIT_size_vectors__  = 0x100;
-define symbol __ICFEDIT_size_startup__  = 0x100;
 /**** End of ICF editor section. ###ICF###*/
 
 
 define memory mem with size = 4G;
 
-define region STA_region 		= mem:[from 0x20000000 size __ICFEDIT_size_startup__];
-define region VEC_region 		= mem:[from __ICFEDIT_region_RAM_start__ size __ICFEDIT_size_vectors__];
-define region RAM_region 		= mem:[from __ICFEDIT_region_RAM_start__+__ICFEDIT_size_vectors__ to __ICFEDIT_region_RAM_end__];
-define region DDRAM_region  	= mem:[from 0x20000100 to 0x20FFFFFF];
-define region SIMU_region		= mem:[from 0x21000000 to 0x23FFFFFF];
+
+define region VEC_region 		= mem:[from __ICFEDIT_region_VEC_start__ to __ICFEDIT_region_VEC_end__];
+define region CODE_region 		= mem:[from __ICFEDIT_region_CODE_start__ to __ICFEDIT_region_CODE_end__];
+define region RODATA_region 	= mem:[from __ICFEDIT_region_RODATA_start__ to __ICFEDIT_region_RODATA_end__];
+
+define region RO_region  	    = mem:[from __ICFEDIT_region_RO_start__ to __ICFEDIT_region_RO_end__];
+define region STK_region  	    = mem:[from __ICFEDIT_region_STK_start__ to __ICFEDIT_region_STK_end__];
+define region BSS_region 		= mem:[from __ICFEDIT_region_BSS_start__ to __ICFEDIT_region_BSS_end__];
+define region DATA_region 		= mem:[from __ICFEDIT_region_DATA_start__ to __ICFEDIT_region_DATA_end__];
+
+define region SIMU_region		= mem:[from 0x20300000 to 0x23FFFFFF];
 define region TRANSFER_region	= mem:[from 0x26000000 to 0x277FFFFF];
 define region G_region			= mem:[from 0x27800000 to 0x27FFFFFF];
 
+define block FIQ_STACK     	with alignment = 8, size = __ICFEDIT_size_fiqstack__ { };
+define block IRQ_STACK     	with alignment = 8, size = __ICFEDIT_size_irqstack__ { };
+define block SVC_STACK     	with alignment = 8, size = __ICFEDIT_size_svcstack__ { };
+define block ABT_STACK     	with alignment = 8, size = __ICFEDIT_size_abtstack__ { };
+define block UND_STACK     	with alignment = 8, size = __ICFEDIT_size_undstack__ { };
 
 define block CSTACK        	with alignment = 8, size = __ICFEDIT_size_cstack__   { };
-define block SVC_STACK     	with alignment = 8, size = __ICFEDIT_size_svcstack__ { };
-define block IRQ_STACK     	with alignment = 8, size = __ICFEDIT_size_irqstack__ { };
-define block FIQ_STACK     	with alignment = 8, size = __ICFEDIT_size_fiqstack__ { };
-define block UND_STACK     	with alignment = 8, size = __ICFEDIT_size_undstack__ { };
-define block ABT_STACK     	with alignment = 8, size = __ICFEDIT_size_abtstack__ { };
 define block HEAP          	with alignment = 8, size = __ICFEDIT_size_heap__     { };
 define block SIMU_BLOCK    	with alignment = 8, size = 0x02000000  			{section TRAN_SECTION, 
 																			 section ChData2060_SECTION, 
@@ -48,25 +72,23 @@ define block G_BLOCK       	with alignment = 8, size = 0x00800000     { section 
 define block STATIC_BLOCK  	with alignment = 8, size = 0x00800000 {};
 define block DYNAMIC_BLOCK 	with alignment = 8, size = 0x01000000 {};
 
-//define block MYBLOCK2  with alignment = 8, size = 0x3000000   				{ };
-//define block MYBLOCK3  with alignment = 8, size = 0x2000000   				{ };
-
-
 initialize by copy { readwrite };
 do not initialize  { section .noinit };
 
-place in STA_region { section text };
-place in VEC_region { section .vectors };
-place at address mem:__ICFEDIT_intvec_start__    { readonly section .intvec };
-
-define symbol __ICFEDIT_intvec_remap_start__ = 0x00000000;
+place in VEC_region  	{ readonly  section .intvec};
+place in RODATA_region 	{ readonly  section .rodata};
+place in CODE_region 	{ readonly  section .text  };
+//place at address mem:__ICFEDIT_intvec_start__    { readonly section .intvec };
+//define symbol __ICFEDIT_intvec_remap_start__ = 0x00000000;
 //place at address mem:__ICFEDIT_intvec_remap_start__ { readonly section .intvec_remap };
 												 
-place in G_region  	  { block G_BLOCK};
-place in SIMU_region  { block SIMU_BLOCK};
-place in DDRAM_region { readonly };
-place in DDRAM_region { readwrite, 
-                        block CSTACK, block SVC_STACK, block IRQ_STACK, block FIQ_STACK,
-                        block UND_STACK, block ABT_STACK, block HEAP };
+
+place in RO_region  { readonly };
+place in STK_region { readwrite, 
+						block FIQ_STACK, block IRQ_STACK, block SVC_STACK, block ABT_STACK, block UND_STACK, block CSTACK, block HEAP };
+place in BSS_region { readwrite section .bss  };
+place in DATA_region { readwrite section .data };
+place in G_region  	{ block G_BLOCK};
+place in SIMU_region{ block SIMU_BLOCK};
 place in TRANSFER_region {block STATIC_BLOCK, block DYNAMIC_BLOCK};
 define exported symbol fl_sdram_end = (__ICFEDIT_region_RAM_end__ & 0xFFFFFFF8);

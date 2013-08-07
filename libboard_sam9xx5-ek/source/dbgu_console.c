@@ -427,7 +427,6 @@ extern uint32_t DBGU_GetHexa32( uint32_t* pdwValue )
 extern WEAK signed int putchar( signed int c )
 {
     DBGU_PutChar( c ) ;
-
     return c ;
 }
 #endif // defined __ICCARM__

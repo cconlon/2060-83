@@ -341,19 +341,15 @@ INT32S Simu_BulidTran()//为各个转速创建原始数据，原始数据长度固定
     }
     
     p32s+=p1->nKeycnt;
-    if(l>600)
-      l=l;
+
     for(step=0;step<g_nDatalth;step++)
     {
       FP32 v=0.000005236*l*step;
-      //p32s[step]=(sin(v)*g_fCof1x+sin(v*2)*g_fCof2x+sin(v/2)*g_fCofP5x)*g_fLevel;
-      p32s[step] = v*g_fCof1x;
+      p32s[step]=(sin(v)*g_fCof1x+sin(v*2)*g_fCof2x+sin(v/2)*g_fCofP5x)*g_fLevel;
+      //p32s[step] = v*g_fCof1x;
       p32s[step]>>=2; 
     }					
-    if(l==804||l==2028||l==3000)
-      l=l;
-    if(p1->nKeycnt>10)
-      p1=p1;
+
     p8=(INT8S *)p1;
     p1=(struct tagChData2060 *)(p8+nDatalth);
   }	
@@ -595,8 +591,7 @@ INT32S Simu_Send_Data(void *ps)
           }
         }
         //CheckSimuData();
-        if(i==0)
-          i=i;
+
         if(i==pAlert->nTigerTime)//报警时间
         {
           pAv->nRPM=nSpeed[nKeyNo];
@@ -630,11 +625,12 @@ INT32S Simu_Send_Data(void *ps)
         pchData->nTrigerTime=i;
         pchData->nChNo=g_nSit[j];
         
-        if(1 /* czx i==pAlert->nTigerTime&&g_nSit[j]==pAlert->nChNo[nChIndex]*/)//报警通道
+        //if(1 /* czx i==pAlert->nTigerTime&&g_nSit[j]==pAlert->nChNo[nChIndex]*/)//报警通道
+        INT32S step;
+        INT32S* p32s=(&pchData->nKeycnt)+1;
+        p32s+=pchData->nKeycnt;
+        if((i==pAlert->nTigerTime) && (g_nSit[j]==pAlert->nChNo[nChIndex]))
         {
-          INT32S step;
-          INT32S* p32s=&pchData->nKeycnt+1;
-          p32s+=pchData->nKeycnt;
           for(step=0;step<g_nDatalth;step++)//修改报警通道原始数据幅值
           {
             p32s[step]=p32s[step]*pAlert->fCof[nChIndex]*g_12Param.SignalChannel[g_nSit[j]].fSensority;
@@ -643,26 +639,21 @@ INT32S Simu_Send_Data(void *ps)
         }
         else
         {
-          INT32S step;
-          INT32S* p32s=(&pchData->nKeycnt)+1;
-          p32s+=pchData->nKeycnt;
-          //if(i>600)
-          //    i=i;
           //if(g_nSit[j]/2*2==g_nSit[j])
           if((g_nSit[j]^(g_nSit[j]-1)) != 1)
           {
             for(step=0;step<g_nDatalth;step++)//修改报警通道原始数据幅值
             {
-              //czx p32s[step]*=(100+fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
-              p32s[step] = 0;
+              p32s[step]*=(100+fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
+              //p32s[step] = 0;
             }
           }
           else
           {
             for(step=0;step<g_nDatalth;step++)//修改报警通道原始数据幅值
             {
-              //czx p32s[step]*=(100-fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
-              p32s[step] = 0;
+              p32s[step]*=(100-fSign)/100.*g_12Param.SignalChannel[g_nSit[j]].fSensority;
+              //p32s[step] = 0;
             }
           }				
           nChIndex++;
@@ -673,7 +664,7 @@ INT32S Simu_Send_Data(void *ps)
       //输出所有通道数据头
       OutputChValue();	
       //输出所有通道原始数据
-      
+
       Simu_Write_ChData(g_nLength,g_nChNo,_MAX_SIGNAL_CHANNEL_CNT,
                         g_nFpgaDynamicChDataOffset,g_nFpgaDynamicKeyDataOffset,g_nFpgaDynamicChDataSampleStep,
                         g_nFpgaTranDataOffset,g_nFpgaTranKeyDataOffset,g_nFpgaTranDataSampleStep);
@@ -702,14 +693,15 @@ INT32S Simu_Send_Data(void *ps)
       if(i==g_nAllcnt)
       {
         i=0;
-        //break;
-      }
+        break;
+      } 
       //OSSchedUnlock();//允许任务切换 
       //CheckSimuData();
       //printf("Simu_Send_Data\n");
-      OSTimeDlyHMSM(0,0,0,100);
+      OSTimeDly(10);
     }
     //_log("End Send SimuData\n");
+    OSTimeDly(20);
   }while(1);
   //free(p);	
   return re;

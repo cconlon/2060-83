@@ -545,6 +545,8 @@ extern void Simu_Send_Data(void* ps);
 extern void receive_channel_data(void *arg);
 
 static CPU_STK static_transfer_stk[STATIC_TRANSFER_TASK_SIZE];
+static CPU_STK dynamic_transfer_stk[DYNAMIC_TRANSFER_TASK_SIZE];
+
 static CPU_STK Simu_Send_Data_stk[SIMU_SEND_DATA_TASK_SIZE];
 
 INT32S Start2060()
@@ -560,10 +562,12 @@ INT32S Start2060()
                   SIMU_SEND_DATA_TASK_PRIO, &Simu_Send_Data_stk[0], SIMU_SEND_DATA_TASK_SIZE, 0, OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);
      
  
-  OSTaskCreateExt(static_transfer, 0, 
-                  &static_transfer_stk[STATIC_TRANSFER_TASK_SIZE-1], STATIC_TRANSFER_TASK_PRIO, STATIC_TRANSFER_TASK_PRIO, 
-                  &static_transfer_stk[0], STATIC_TRANSFER_TASK_SIZE, 0, OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);
-
+//  OSTaskCreateExt(static_transfer, 0, 
+//                  &static_transfer_stk[STATIC_TRANSFER_TASK_SIZE-1], STATIC_TRANSFER_TASK_PRIO, STATIC_TRANSFER_TASK_PRIO, 
+//                  &static_transfer_stk[0], STATIC_TRANSFER_TASK_SIZE, 0, OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);
+  OSTaskCreateExt(dynamic_transfer, 0, 
+                  &dynamic_transfer_stk[DYNAMIC_TRANSFER_TASK_SIZE-1], DYNAMIC_TRANSFER_TASK_SIZE, DYNAMIC_TRANSFER_TASK_SIZE, 
+                  &dynamic_transfer_stk[0], DYNAMIC_TRANSFER_TASK_SIZE, 0, OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR);
   
   //OSTaskCreate(dynamic_transfer, 0, &TaskStk[6][TASK_STK_SIZE-1], Task1_Prio+DYNAMIC_TRANSFER_TASK_PRIO);
   //OSTaskCreate(tran_transfer, 0, &TaskStk[7][TASK_STK_SIZE-1], Task1_Prio+TRAN_TRANSFER_TASK_PRIO);

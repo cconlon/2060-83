@@ -4,6 +4,7 @@
 #include "netservices.h"
 #include "ucos_ii.h"
 #include "lib_mem.h"
+#include <string.h>
 
 #define PACKETSIZE 4096
 extern Static_Triger_Table      g_StaticTrigerEventArray[_MAX_JKEY_CHANNEL_CNT];
@@ -33,11 +34,11 @@ typedef struct
 //static int32_t tranBuffer   [1<<25];
 void send_data(int32_t pipe, int8_t *buffer, int32_t size);
 void read_RamDisk(int32_t *nbuffer, const uint32_t addr, int32_t *buffer, int32_t len);
-#define WAIT_TRIGGER(jkey, rArray, EventArray, ms) \
+#define WAIT_TRIGGER(jkey, rArray, EventArray, nTick) \
 while(1) {\
   rArray = EventArray[jkey].ulnTrigerRead; \
     if(rArray == EventArray[jkey].ulnTrigerWrite) { \
-      OSTimeDlyHMSM(0,0,0,ms); \
+      OSTimeDly(nTick); \
         if(_MAX_JKEY_CHANNEL_CNT == ++jkey) jkey = 0; \
           continue; \
     } \
@@ -54,6 +55,7 @@ void realdata_transfer(void * pParam);
 void static_transfer(void * pParam)
 {
   uint32_t jkey = 0;
+  int kkk = 0;
   int32_t rArray;
   int32_t channel = 0;
   uint32_t sBuffer = 0;
@@ -63,25 +65,12 @@ void static_transfer(void * pParam)
   Channel_Static_Value *pValueHead;
   uint32_t *StaticBuffer = __section_begin("STATIC_BLOCK");
   
-  fd = channel_open("10.217.3.200", 50001);
+  fd = channel_open("10.217.3.200", 20601);
   while(1)
   {
-    while(1) {
-      rArray = g_StaticTrigerEventArray[jkey].ulnTrigerRead;
-      if(rArray == g_StaticTrigerEventArray[jkey].ulnTrigerWrite) {
-        //OSTimeDlyHMSM(0,0,0,100);
-        OSTimeDly(2);
-        if(_MAX_JKEY_CHANNEL_CNT == ++jkey) jkey = 0;
-        continue;
-      }
-      else {
-        break;
-      } 
-    }
-    //WAIT_TRIGGER(jkey, rArray, g_StaticTrigerEventArray, 50)
-    //  ;
-    
-    OSSchedLock();
+    WAIT_TRIGGER(jkey, rArray, g_StaticTrigerEventArray, 2)
+      ;
+
     sBuffer = sizeof(ProtocolHead) + (g_83param.Device[jkey].nSignChannelNum*sizeof(Channel_Static_Value));
     StaticBuffer[0] = sBuffer + 8;
     StaticBuffer[1] = sBuffer + 4;
@@ -118,19 +107,24 @@ void static_transfer(void * pParam)
     
     if(_MAX_STATIC_ARRAY_LTH == ++rArray)
       rArray = 0;
+    OSSchedLock();
     g_StaticTrigerEventArray[jkey].ulnTrigerRead = rArray;
     OSSchedUnlock();
     
+    ++kkk;
     channel_write(fd, StaticBuffer, sBuffer);
+    if(kkk == 20)
+      channel_close(fd);
     /*
     OSSchedLock();
     send_data(_STATIC_CHNO, (int8_t *)StaticBuffer, sBuffer);
     OSSchedUnlock();
     */
-    OSTimeDlyHMSM(0,0,2,0);
+    OSTimeDlyHMSM(0,0,0,200);
   }
 }
 
+#pragma segment="DYNAMIC_BLOCK"
 void dynamic_transfer(void * pParam)
 {
   uint32_t jkey = 0;
@@ -160,7 +154,8 @@ void dynamic_transfer(void * pParam)
   ProtocolHead *pProtocolHead;
   Channel_Dynamic_Value *pValueHead;
   int32_t *pBuffer;
-  
+  uint32_t *DynamicBuffer = __section_begin("DYNAMIC_BLOCK");
+  int fd;
   //_log("dynamic_transfer\n");
   //while(1)
   //{
@@ -169,12 +164,12 @@ void dynamic_transfer(void * pParam)
   //    _log(testdata);
   //    PC_DispStr(0, 1,  testdata, DISP_FGND_WHITE + DISP_BGND_GREEN);
   //}
-#if 0
+  fd = channel_open("10.217.3.200", 20601);
   while(1)
   {
-    WAIT_TRIGGER(jkey, rArray, g_DynamicTrigerEventArray, 10)
+    WAIT_TRIGGER(jkey, rArray, g_DynamicTrigerEventArray, 2)
       ;
-    OSSchedLock(&err);
+    
     sJkeyBlock = g_83param.Device[jkey].nChKeyBlockSize;
     sWaveBlock = g_83param.Device[jkey].nChDynamicBlockSize;
     nValidBlocks = g_DynamicTrigerEventArray[jkey].ChannelSignalDataTable[rArray].ulnBlockCnt;
@@ -284,19 +279,18 @@ void dynamic_transfer(void * pParam)
     }
     if(_MAX_DYNAMIC_ARRAY_LTH == ++rArray)
       rArray = 0;
+    
+    OSSchedLock();
     g_DynamicTrigerEventArray[jkey].ulnTrigerRead = rArray;
-    OSSchedUnlock(&err);
+    OSSchedUnlock();
     
     sBuffer = (pBuffer - DynamicBuffer - 2) << 2;//all data length by byte
     DynamicBuffer[0] = sBuffer + 8;
     DynamicBuffer[1] = sBuffer + 4;
     sBuffer += 8;
-    OSSchedLock(&err);
-    send_data(_DYNAMIC_CHNO, (int8_t *)DynamicBuffer, sBuffer);
-    OSSchedUnlock(&err);
-    sleep_ms(20);
+
+    channel_write(fd, DynamicBuffer, sBuffer);
   }
-#endif
 }
 
 void tran_transfer(void * pParam)

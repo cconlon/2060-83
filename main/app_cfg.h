@@ -68,8 +68,8 @@
 *********************************************************************************************************
 */
 #define STATIC_TRANSFER_TASK_SIZE                       1024u
-#define DYNAMIC_TRANSFER_TASK_SIZE                  	1024u
-#define SIMU_SEND_DATA_TASK_SIZE                        1024u
+#define DYNAMIC_TRANSFER_TASK_SIZE                  	2048u
+#define SIMU_SEND_DATA_TASK_SIZE                        2048u
 
 #define APP_TASK0_TASK_SIZE                            1024u
 #define  APP_CFG_TASK_START_STK_SIZE                   1024u
